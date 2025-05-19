@@ -1,6 +1,6 @@
 
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Navigate } from 'react-router-dom';
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -11,6 +11,9 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import StarRating from '@/components/Forms/StarRating';
 import PriceRangeSelector from '@/components/Forms/PriceRangeSelector';
+import { useAuth } from '@/context/AuthContext';
+import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
 
 const formSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
@@ -25,6 +28,9 @@ type FormValues = z.infer<typeof formSchema>;
 
 export default function AddPlacePage() {
   const navigate = useNavigate();
+  const { user, loading } = useAuth();
+  const { toast } = useToast();
+  const [isSubmitting, setIsSubmitting] = useState(false);
   
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -38,14 +44,68 @@ export default function AddPlacePage() {
     },
   });
   
-  const onSubmit = (values: FormValues) => {
-    // In a real app, you would send this data to your backend
-    console.log(values);
+  const onSubmit = async (values: FormValues) => {
+    if (!user) {
+      toast({
+        variant: "destructive",
+        title: "Not authenticated",
+        description: "You must be logged in to add a place.",
+      });
+      return;
+    }
     
-    // Mock success and redirect
-    alert("Place added successfully!");
-    navigate("/");
+    setIsSubmitting(true);
+    
+    try {
+      // Use a geocoding API for production. For now, we'll use mock coordinates
+      const mockLat = 40.7128 + (Math.random() * 0.1);
+      const mockLng = -74.0060 + (Math.random() * 0.1);
+      
+      const { data, error } = await supabase
+        .from('places')
+        .insert([
+          {
+            name: values.name,
+            description: values.description,
+            cover_image: values.coverImage,
+            rating: values.rating,
+            price_range: values.priceRange,
+            address: values.address,
+            lat: mockLat,
+            lng: mockLng,
+            created_by: user.id,
+          }
+        ])
+        .select()
+        .single();
+        
+      if (error) {
+        throw error;
+      }
+      
+      toast({
+        title: "Place added successfully",
+        description: `${values.name} has been added to your places.`,
+      });
+      
+      // Navigate to the new place
+      navigate(`/places/${data.id}`);
+    } catch (error: any) {
+      console.error('Error adding place:', error);
+      toast({
+        variant: "destructive",
+        title: "Error adding place",
+        description: error.message || "An unexpected error occurred. Please try again.",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
+
+  // If not logged in and not loading, redirect to login
+  if (!loading && !user) {
+    return <Navigate to="/login" replace />;
+  }
 
   return (
     <div className="container max-w-3xl py-8">
@@ -184,10 +244,13 @@ export default function AddPlacePage() {
               variant="outline"
               className="mr-2"
               onClick={() => navigate(-1)}
+              disabled={isSubmitting}
             >
               Cancel
             </Button>
-            <Button type="submit">Add Place</Button>
+            <Button type="submit" disabled={isSubmitting}>
+              {isSubmitting ? "Adding..." : "Add Place"}
+            </Button>
           </div>
         </form>
       </Form>

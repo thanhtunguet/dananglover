@@ -1,52 +1,222 @@
 
 import { useState, useEffect } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Star, MapPin, DollarSign, Share, ArrowLeft, Heart, Calendar, Clock } from 'lucide-react';
 import ReviewList from '@/components/Reviews/ReviewList';
 import MapView from '@/components/Map/MapView';
-import { Place } from '@/types';
-import { mockPlaces, mockReviews } from '@/data/mockData';
+import { Place, Review } from '@/types';
+import { useAuth } from '@/context/AuthContext';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
 
 export default function PlaceDetailPage() {
   const { id } = useParams<{ id: string }>();
-  const [place, setPlace] = useState<Place | null>(null);
-  const [isSaved, setIsSaved] = useState(false);
+  const navigate = useNavigate();
+  const { user } = useAuth();
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
 
-  useEffect(() => {
-    // In a real app, you would fetch data from an API
-    const foundPlace = mockPlaces.find(p => p.id === id);
-    setPlace(foundPlace || null);
-  }, [id]);
+  // Fetch place details
+  const { 
+    data: place, 
+    isLoading: placeLoading, 
+    error: placeError 
+  } = useQuery({
+    queryKey: ['place', id],
+    queryFn: async () => {
+      if (!id) return null;
+      
+      const { data, error } = await supabase
+        .from('places')
+        .select('*')
+        .eq('id', id)
+        .single();
+        
+      if (error) {
+        console.error('Error fetching place:', error);
+        throw new Error(error.message);
+      }
+      
+      // Convert to our Place type
+      return {
+        id: data.id,
+        name: data.name,
+        description: data.description,
+        coverImage: data.cover_image,
+        rating: data.rating,
+        priceRange: data.price_range as 1 | 2 | 3,
+        location: {
+          address: data.address,
+          lat: data.lat,
+          lng: data.lng,
+        },
+        createdBy: data.created_by,
+        createdAt: new Date(data.created_at),
+      } as Place;
+    },
+    retry: false,
+  });
 
-  const placeReviews = mockReviews.filter(review => review.placeId === id);
+  // Check if place is saved by the current user
+  const { data: isSaved = false, refetch: refetchSavedStatus } = useQuery({
+    queryKey: ['isSaved', id, user?.id],
+    queryFn: async () => {
+      if (!id || !user) return false;
+      
+      const { data, error } = await supabase
+        .from('saved_places')
+        .select('id')
+        .eq('place_id', id)
+        .eq('user_id', user.id)
+        .single();
+        
+      if (error && error.code !== 'PGRST116') { // Not found error
+        console.error('Error checking saved status:', error);
+      }
+      
+      return !!data;
+    },
+    enabled: !!user && !!id,
+  });
 
-  if (!place) {
-    return (
-      <div className="container py-12 flex items-center justify-center">
-        <p>Place not found</p>
-      </div>
-    );
-  }
+  // Fetch reviews for this place
+  const { 
+    data: reviews = [], 
+    isLoading: reviewsLoading 
+  } = useQuery({
+    queryKey: ['placeReviews', id],
+    queryFn: async () => {
+      if (!id) return [];
+      
+      const { data, error } = await supabase
+        .from('reviews')
+        .select(`
+          *,
+          profiles:user_id (full_name, username)
+        `)
+        .eq('place_id', id)
+        .order('created_at', { ascending: false });
+        
+      if (error) {
+        console.error('Error fetching reviews:', error);
+        throw new Error(error.message);
+      }
+      
+      // Convert to our Review type
+      return data.map(review => ({
+        id: review.id,
+        placeId: review.place_id,
+        userId: review.user_id,
+        userName: review.profiles?.full_name || review.profiles?.username || 'Anonymous',
+        rating: review.rating,
+        comment: review.comment || '',
+        createdAt: new Date(review.created_at),
+      })) as Review[];
+    },
+    enabled: !!id,
+  });
+
+  // Save/unsave place mutation
+  const toggleSaveMutation = useMutation({
+    mutationFn: async () => {
+      if (!id || !user) throw new Error('Authentication required');
+      
+      if (isSaved) {
+        // Delete the saved record
+        const { error } = await supabase
+          .from('saved_places')
+          .delete()
+          .eq('place_id', id)
+          .eq('user_id', user.id);
+          
+        if (error) throw new Error(error.message);
+        return false;
+      } else {
+        // Insert a new saved record
+        const { error } = await supabase
+          .from('saved_places')
+          .insert([{ place_id: id, user_id: user.id }]);
+          
+        if (error) throw new Error(error.message);
+        return true;
+      }
+    },
+    onSuccess: (newSavedState) => {
+      queryClient.invalidateQueries({ queryKey: ['isSaved', id, user?.id] });
+      queryClient.invalidateQueries({ queryKey: ['savedPlaces', user?.id] });
+      
+      toast({
+        title: newSavedState ? 'Place saved' : 'Place unsaved',
+        description: newSavedState 
+          ? 'This place has been added to your saved places.'
+          : 'This place has been removed from your saved places.',
+      });
+    },
+    onError: (error) => {
+      console.error('Error toggling save status:', error);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: (error as Error).message || 'An unexpected error occurred',
+      });
+    },
+  });
+
+  const handleSaveToggle = () => {
+    if (!user) {
+      toast({
+        title: "Authentication required",
+        description: "Please log in to save places",
+        action: (
+          <Button variant="outline" onClick={() => navigate('/login')}>
+            Login
+          </Button>
+        ),
+      });
+      return;
+    }
+    
+    toggleSaveMutation.mutate();
+  };
 
   const handleShare = () => {
-    // In a real app, this would use the Web Share API
-    console.log('Sharing place:', place.name);
-    // Check if Web Share API is supported
     if (navigator.share) {
       navigator
         .share({
-          title: place.name,
-          text: place.description,
+          title: place?.name || 'Check out this place',
+          text: place?.description || 'I found this great place',
           url: window.location.href,
         })
         .catch((error) => console.log('Error sharing', error));
     } else {
       // Fallback
-      alert(`Share ${place.name}: ${window.location.href}`);
+      navigator.clipboard.writeText(window.location.href);
+      toast({
+        title: "Link copied",
+        description: "The link to this place has been copied to your clipboard.",
+      });
     }
   };
+
+  if (placeLoading) {
+    return (
+      <div className="container py-12 flex items-center justify-center">
+        <p>Loading place details...</p>
+      </div>
+    );
+  }
+
+  if (placeError || !place) {
+    return (
+      <div className="container py-12 flex flex-col items-center justify-center gap-4">
+        <p>Place not found or an error occurred.</p>
+        <Button onClick={() => navigate('/')}>Go back to home</Button>
+      </div>
+    );
+  }
 
   return (
     <div className="container pb-12">
@@ -82,7 +252,7 @@ export default function PlaceDetailPage() {
                   <Star className="h-5 w-5 fill-yellow-400 text-yellow-400" />
                   <span className="ml-1 font-medium">{place.rating.toFixed(1)}</span>
                   <span className="mx-1 text-muted-foreground">•</span>
-                  <span className="text-muted-foreground">{placeReviews.length} reviews</span>
+                  <span className="text-muted-foreground">{reviews.length} reviews</span>
                 </div>
                 <span className="mx-2 text-muted-foreground">•</span>
                 <div className="flex items-center text-muted-foreground">
@@ -102,7 +272,8 @@ export default function PlaceDetailPage() {
               <Button
                 variant="outline"
                 size="icon"
-                onClick={() => setIsSaved(!isSaved)}
+                onClick={handleSaveToggle}
+                disabled={toggleSaveMutation.isPending}
               >
                 <Heart className={`h-4 w-4 ${isSaved ? 'fill-red-500 text-red-500' : ''}`} />
                 <span className="sr-only">Save</span>
@@ -131,7 +302,11 @@ export default function PlaceDetailPage() {
             <TabsContent value="reviews" className="mt-4">
               <div className="space-y-4">
                 <h3 className="font-semibold text-lg">Reviews</h3>
-                <ReviewList reviews={placeReviews} />
+                {reviewsLoading ? (
+                  <p>Loading reviews...</p>
+                ) : (
+                  <ReviewList reviews={reviews} />
+                )}
               </div>
             </TabsContent>
             <TabsContent value="info" className="mt-4">
@@ -149,7 +324,7 @@ export default function PlaceDetailPage() {
                     <div>
                       <h4 className="font-medium">Added On</h4>
                       <p className="text-sm text-muted-foreground">
-                        {new Date(place.createdAt).toLocaleDateString()}
+                        {place.createdAt.toLocaleDateString()}
                       </p>
                     </div>
                   </div>
@@ -182,7 +357,10 @@ export default function PlaceDetailPage() {
                 </a>
               </div>
             </div>
-            <Button className="w-full">
+            <Button 
+              className="w-full"
+              onClick={() => user ? navigate('/add-review') : navigate('/login')}
+            >
               <Star className="h-4 w-4 mr-2" />
               Write a review
             </Button>

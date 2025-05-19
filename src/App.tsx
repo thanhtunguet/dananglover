@@ -13,29 +13,32 @@ import AddPlacePage from "./pages/AddPlacePage";
 import ProfilePage from "./pages/ProfilePage";
 import LoginPage from "./pages/LoginPage";
 import NotFound from "./pages/NotFound";
+import { AuthProvider } from "./context/AuthContext";
 
 const queryClient = new QueryClient();
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <Routes>
-          <Route path="/login" element={<LoginPage />} />
-          <Route element={<AppLayout />}>
-            <Route path="/" element={<HomePage />} />
-            <Route path="/places/:id" element={<PlaceDetailPage />} />
-            <Route path="/map" element={<MapPage />} />
-            <Route path="/saved" element={<SavedPlacesPage />} />
-            <Route path="/add-place" element={<AddPlacePage />} />
-            <Route path="/profile" element={<ProfilePage />} />
-          </Route>
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </BrowserRouter>
-    </TooltipProvider>
+    <AuthProvider>
+      <TooltipProvider>
+        <Toaster />
+        <Sonner />
+        <BrowserRouter>
+          <Routes>
+            <Route path="/login" element={<LoginPage />} />
+            <Route element={<AppLayout />}>
+              <Route path="/" element={<HomePage />} />
+              <Route path="/places/:id" element={<PlaceDetailPage />} />
+              <Route path="/map" element={<MapPage />} />
+              <Route path="/saved" element={<SavedPlacesPage />} />
+              <Route path="/add-place" element={<AddPlacePage />} />
+              <Route path="/profile" element={<ProfilePage />} />
+            </Route>
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </BrowserRouter>
+      </TooltipProvider>
+    </AuthProvider>
   </QueryClientProvider>
 );
 

@@ -9,7 +9,139 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      places: {
+        Row: {
+          address: string
+          cover_image: string
+          created_at: string
+          created_by: string
+          description: string
+          id: string
+          lat: number
+          lng: number
+          name: string
+          price_range: number
+          rating: number
+        }
+        Insert: {
+          address: string
+          cover_image: string
+          created_at?: string
+          created_by: string
+          description: string
+          id?: string
+          lat: number
+          lng: number
+          name: string
+          price_range: number
+          rating?: number
+        }
+        Update: {
+          address?: string
+          cover_image?: string
+          created_at?: string
+          created_by?: string
+          description?: string
+          id?: string
+          lat?: number
+          lng?: number
+          name?: string
+          price_range?: number
+          rating?: number
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          created_at: string
+          full_name: string | null
+          id: string
+          updated_at: string
+          username: string | null
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string
+          full_name?: string | null
+          id: string
+          updated_at?: string
+          username?: string | null
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string
+          full_name?: string | null
+          id?: string
+          updated_at?: string
+          username?: string | null
+        }
+        Relationships: []
+      }
+      reviews: {
+        Row: {
+          comment: string | null
+          created_at: string
+          id: string
+          place_id: string
+          rating: number
+          user_id: string
+        }
+        Insert: {
+          comment?: string | null
+          created_at?: string
+          id?: string
+          place_id: string
+          rating: number
+          user_id: string
+        }
+        Update: {
+          comment?: string | null
+          created_at?: string
+          id?: string
+          place_id?: string
+          rating?: number
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reviews_place_id_fkey"
+            columns: ["place_id"]
+            isOneToOne: false
+            referencedRelation: "places"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      saved_places: {
+        Row: {
+          created_at: string
+          id: string
+          place_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          place_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          place_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "saved_places_place_id_fkey"
+            columns: ["place_id"]
+            isOneToOne: false
+            referencedRelation: "places"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never

@@ -1,213 +1,291 @@
 
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { useNavigate, Navigate } from "react-router-dom";
+import { FcGoogle } from "react-icons/fc";
+import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
+
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { MapPin } from "lucide-react";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { useAuth } from "@/context/AuthContext";
+import { useToast } from "@/hooks/use-toast";
 
 const loginSchema = z.object({
   email: z.string().email("Please enter a valid email address"),
   password: z.string().min(6, "Password must be at least 6 characters"),
 });
 
-const registerSchema = z.object({
-  name: z.string().min(2, "Name must be at least 2 characters"),
-  email: z.string().email("Please enter a valid email address"),
-  password: z.string().min(6, "Password must be at least 6 characters"),
+const signupSchema = loginSchema.extend({
+  fullName: z.string().min(2, "Name must be at least 2 characters"),
 });
 
+type LoginFormValues = z.infer<typeof loginSchema>;
+type SignupFormValues = z.infer<typeof signupSchema>;
+
 export default function LoginPage() {
-  const [activeTab, setActiveTab] = useState<string>("login");
-  
-  // Login form
-  const loginForm = useForm<z.infer<typeof loginSchema>>({
+  const [activeTab, setActiveTab] = useState<"login" | "signup">("login");
+  const { user, signIn, signUp, googleSignIn, loading } = useAuth();
+  const navigate = useNavigate();
+  const { toast } = useToast();
+
+  const loginForm = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
       email: "",
       password: "",
     },
   });
-  
-  // Register form
-  const registerForm = useForm<z.infer<typeof registerSchema>>({
-    resolver: zodResolver(registerSchema),
+
+  const signupForm = useForm<SignupFormValues>({
+    resolver: zodResolver(signupSchema),
     defaultValues: {
-      name: "",
       email: "",
       password: "",
+      fullName: "",
     },
   });
 
-  const onLoginSubmit = (data: z.infer<typeof loginSchema>) => {
-    console.log("Login data:", data);
-    // In a real app, this would authenticate with Supabase
-    alert("Login functionality would be implemented with Supabase");
+  const onLogin = async (data: LoginFormValues) => {
+    try {
+      const { error } = await signIn(data.email, data.password);
+      
+      if (error) {
+        toast({
+          variant: "destructive",
+          title: "Login failed",
+          description: error.message,
+        });
+        return;
+      }
+
+      navigate('/profile');
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Login failed",
+        description: "An unexpected error occurred. Please try again.",
+      });
+    }
   };
 
-  const onRegisterSubmit = (data: z.infer<typeof registerSchema>) => {
-    console.log("Register data:", data);
-    // In a real app, this would register with Supabase
-    alert("Registration functionality would be implemented with Supabase");
+  const onSignup = async (data: SignupFormValues) => {
+    try {
+      const { error } = await signUp(
+        data.email, 
+        data.password, 
+        { full_name: data.fullName }
+      );
+      
+      if (error) {
+        toast({
+          variant: "destructive",
+          title: "Signup failed",
+          description: error.message,
+        });
+        return;
+      }
+
+      toast({
+        title: "Account created",
+        description: "Please check your email to verify your account.",
+      });
+      
+      navigate('/profile');
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Signup failed",
+        description: "An unexpected error occurred. Please try again.",
+      });
+    }
   };
 
-  const handleGoogleLogin = () => {
-    // In a real app, this would trigger Google OAuth with Supabase
-    alert("Google login would be implemented with Supabase");
+  const handleGoogleSignIn = async () => {
+    try {
+      await googleSignIn();
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Google Sign-in failed",
+        description: "An unexpected error occurred. Please try again.",
+      });
+    }
   };
+
+  // If user is already logged in, redirect to profile
+  if (user && !loading) {
+    return <Navigate to="/profile" replace />;
+  }
 
   return (
-    <div className="container flex items-center justify-center min-h-screen">
-      <div className="mx-auto max-w-md w-full p-6 space-y-6 border rounded-xl shadow-sm bg-card">
-        <div className="flex flex-col items-center space-y-2 text-center">
-          <Link to="/" className="flex items-center space-x-2">
-            <MapPin className="h-6 w-6 text-primary" />
-            <span className="font-bold text-xl">Hangout</span>
-          </Link>
-          <h1 className="text-2xl font-bold">Welcome to Hangout</h1>
-          <p className="text-muted-foreground">Sign in to your account or create a new one</p>
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
+      <div className="w-full max-w-md space-y-8 bg-white p-8 rounded-lg shadow-md">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold">Welcome to Hangouts</h1>
+          <p className="text-gray-600 mt-2">Sign in to discover amazing places</p>
         </div>
 
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+        <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as "login" | "signup")}>
           <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="login">Login</TabsTrigger>
-            <TabsTrigger value="register">Register</TabsTrigger>
+            <TabsTrigger value="signup">Sign Up</TabsTrigger>
           </TabsList>
           
-          <TabsContent value="login">
-            <div className="space-y-4">
-              <Form {...loginForm}>
-                <form onSubmit={loginForm.handleSubmit(onLoginSubmit)} className="space-y-4">
-                  <FormField
-                    control={loginForm.control}
-                    name="email"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Email</FormLabel>
-                        <FormControl>
-                          <Input placeholder="your@email.com" type="email" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  
-                  <FormField
-                    control={loginForm.control}
-                    name="password"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Password</FormLabel>
-                        <FormControl>
-                          <Input placeholder="••••••••" type="password" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  
-                  <Button type="submit" className="w-full">
-                    Sign In
-                  </Button>
-                </form>
-              </Form>
-              
+          <TabsContent value="login" className="mt-6">
+            <Form {...loginForm}>
+              <form onSubmit={loginForm.handleSubmit(onLogin)} className="space-y-4">
+                <FormField
+                  control={loginForm.control}
+                  name="email"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Email</FormLabel>
+                      <FormControl>
+                        <Input 
+                          type="email" 
+                          placeholder="you@example.com" 
+                          {...field} 
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                
+                <FormField
+                  control={loginForm.control}
+                  name="password"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Password</FormLabel>
+                      <FormControl>
+                        <Input 
+                          type="password" 
+                          placeholder="••••••••" 
+                          {...field} 
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <Button type="submit" className="w-full">
+                  Login
+                </Button>
+              </form>
+            </Form>
+            
+            <div className="mt-4">
               <div className="relative">
                 <div className="absolute inset-0 flex items-center">
-                  <span className="w-full border-t" />
+                  <div className="w-full border-t border-gray-300"></div>
                 </div>
-                <div className="relative flex justify-center text-xs uppercase">
-                  <span className="bg-card px-2 text-muted-foreground">
-                    Or continue with
-                  </span>
+                <div className="relative flex justify-center text-sm">
+                  <span className="bg-white px-2 text-gray-500">Or continue with</span>
                 </div>
               </div>
               
-              <Button
-                variant="outline"
-                type="button"
-                className="w-full"
-                onClick={handleGoogleLogin}
+              <Button 
+                variant="outline" 
+                className="w-full mt-4"
+                onClick={handleGoogleSignIn}
               >
-                Continue with Google
+                <FcGoogle className="mr-2 h-4 w-4" />
+                Google
               </Button>
             </div>
           </TabsContent>
           
-          <TabsContent value="register">
-            <div className="space-y-4">
-              <Form {...registerForm}>
-                <form onSubmit={registerForm.handleSubmit(onRegisterSubmit)} className="space-y-4">
-                  <FormField
-                    control={registerForm.control}
-                    name="name"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Name</FormLabel>
-                        <FormControl>
-                          <Input placeholder="John Doe" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  
-                  <FormField
-                    control={registerForm.control}
-                    name="email"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Email</FormLabel>
-                        <FormControl>
-                          <Input placeholder="your@email.com" type="email" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  
-                  <FormField
-                    control={registerForm.control}
-                    name="password"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Password</FormLabel>
-                        <FormControl>
-                          <Input placeholder="••••••••" type="password" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  
-                  <Button type="submit" className="w-full">
-                    Create Account
-                  </Button>
-                </form>
-              </Form>
-              
+          <TabsContent value="signup" className="mt-6">
+            <Form {...signupForm}>
+              <form onSubmit={signupForm.handleSubmit(onSignup)} className="space-y-4">
+                <FormField
+                  control={signupForm.control}
+                  name="fullName"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Full Name</FormLabel>
+                      <FormControl>
+                        <Input 
+                          placeholder="John Doe" 
+                          {...field} 
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                
+                <FormField
+                  control={signupForm.control}
+                  name="email"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Email</FormLabel>
+                      <FormControl>
+                        <Input 
+                          type="email" 
+                          placeholder="you@example.com" 
+                          {...field} 
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                
+                <FormField
+                  control={signupForm.control}
+                  name="password"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Password</FormLabel>
+                      <FormControl>
+                        <Input 
+                          type="password" 
+                          placeholder="••••••••" 
+                          {...field} 
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <Button type="submit" className="w-full">
+                  Sign Up
+                </Button>
+              </form>
+            </Form>
+            
+            <div className="mt-4">
               <div className="relative">
                 <div className="absolute inset-0 flex items-center">
-                  <span className="w-full border-t" />
+                  <div className="w-full border-t border-gray-300"></div>
                 </div>
-                <div className="relative flex justify-center text-xs uppercase">
-                  <span className="bg-card px-2 text-muted-foreground">
-                    Or continue with
-                  </span>
+                <div className="relative flex justify-center text-sm">
+                  <span className="bg-white px-2 text-gray-500">Or continue with</span>
                 </div>
               </div>
               
-              <Button
-                variant="outline"
-                type="button"
-                className="w-full"
-                onClick={handleGoogleLogin}
+              <Button 
+                variant="outline" 
+                className="w-full mt-4"
+                onClick={handleGoogleSignIn}
               >
-                Continue with Google
+                <FcGoogle className="mr-2 h-4 w-4" />
+                Google
               </Button>
             </div>
           </TabsContent>

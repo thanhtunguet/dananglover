@@ -1,31 +1,79 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Search } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import PlaceGrid from '@/components/Places/PlaceGrid';
-import { mockPlaces } from '@/data/mockData';
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
+import { Place } from '@/types';
+import { useToast } from '@/hooks/use-toast';
 
 export default function HomePage() {
   const [searchQuery, setSearchQuery] = useState('');
-  const [filteredPlaces, setFilteredPlaces] = useState(mockPlaces);
-
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
+  const [filteredPlaces, setFilteredPlaces] = useState<Place[]>([]);
+  const { toast } = useToast();
+  
+  // Fetch all places
+  const { data: places = [], isLoading } = useQuery({
+    queryKey: ['places'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('places')
+        .select('*')
+        .order('created_at', { ascending: false });
+        
+      if (error) {
+        console.error('Error fetching places:', error);
+        toast({
+          variant: "destructive",
+          title: "Error loading places",
+          description: error.message,
+        });
+        return [];
+      }
+      
+      // Convert to our Place type
+      return data.map(place => ({
+        id: place.id,
+        name: place.name,
+        description: place.description,
+        coverImage: place.cover_image,
+        rating: place.rating,
+        priceRange: place.price_range as 1 | 2 | 3,
+        location: {
+          address: place.address,
+          lat: place.lat,
+          lng: place.lng,
+        },
+        createdBy: place.created_by,
+        createdAt: new Date(place.created_at),
+      })) as Place[];
+    },
+  });
+  
+  // Update filtered places when places change or search query changes
+  useEffect(() => {
+    if (!places) return;
     
     if (searchQuery.trim() === '') {
-      setFilteredPlaces(mockPlaces);
+      setFilteredPlaces(places);
       return;
     }
     
     const query = searchQuery.toLowerCase();
-    const results = mockPlaces.filter(place => 
+    const results = places.filter(place => 
       place.name.toLowerCase().includes(query) || 
       place.description.toLowerCase().includes(query) ||
       place.location.address.toLowerCase().includes(query)
     );
     
     setFilteredPlaces(results);
+  }, [places, searchQuery]);
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    // The filtering is already handled by the useEffect
   };
 
   return (
@@ -61,7 +109,13 @@ export default function HomePage() {
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-2xl font-bold tracking-tight">Popular Places</h2>
           </div>
-          <PlaceGrid places={filteredPlaces} />
+          {isLoading ? (
+            <div className="flex items-center justify-center h-40">
+              <p>Loading places...</p>
+            </div>
+          ) : (
+            <PlaceGrid places={filteredPlaces} />
+          )}
         </section>
       </div>
     </div>
