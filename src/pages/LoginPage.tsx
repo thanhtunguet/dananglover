@@ -1,7 +1,6 @@
-
 import { useState } from "react";
 import { useNavigate, Navigate } from "react-router-dom";
-import { FcGoogle } from "react-icons/fc";
+import { FaGoogle } from "react-icons/fa";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -112,7 +111,15 @@ export default function LoginPage() {
 
   const handleGoogleSignIn = async () => {
     try {
-      await googleSignIn();
+      const { error } = await googleSignIn();
+      
+      if (error && error.message !== "Unsupported provider: provider is not enabled") {
+        toast({
+          variant: "destructive",
+          title: "Google Sign-in failed",
+          description: error.message,
+        });
+      }
     } catch (error) {
       toast({
         variant: "destructive",
@@ -201,7 +208,7 @@ export default function LoginPage() {
                 className="w-full mt-4"
                 onClick={handleGoogleSignIn}
               >
-                <FcGoogle className="mr-2 h-4 w-4" />
+                <FaGoogle className="mr-2 h-4 w-4 text-red-500" />
                 Google
               </Button>
             </div>
@@ -284,7 +291,7 @@ export default function LoginPage() {
                 className="w-full mt-4"
                 onClick={handleGoogleSignIn}
               >
-                <FcGoogle className="mr-2 h-4 w-4" />
+                <FaGoogle className="mr-2 h-4 w-4 text-red-500" />
                 Google
               </Button>
             </div>

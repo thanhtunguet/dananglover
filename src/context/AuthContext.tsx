@@ -17,7 +17,13 @@ interface AuthContextType {
     data: Session | null;
   }>;
   signOut: () => Promise<void>;
-  googleSignIn: () => Promise<void>;
+  googleSignIn: () => Promise<{
+    error: AuthError | null;
+    data: {
+      provider: string;
+      url: string | null;
+    } | null;
+  }>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -87,12 +93,42 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   const googleSignIn = async () => {
-    await supabase.auth.signInWithOAuth({
-      provider: 'google',
-      options: {
-        redirectTo: `${window.location.origin}/profile`
+    try {
+      const response = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: `${window.location.origin}/profile`
+        }
+      });
+      
+      if (response.error) {
+        toast({
+          variant: "destructive",
+          title: "Google Sign-in failed",
+          description: response.error.message === "Unsupported provider: provider is not enabled" 
+            ? "Google login is not enabled in Supabase. Please enable it in the Supabase dashboard."
+            : response.error.message,
+        });
       }
-    });
+      
+      return response;
+    } catch (error) {
+      let errorMessage = "An unexpected error occurred. Please try again.";
+      if (error instanceof Error) {
+        errorMessage = error.message;
+      }
+      
+      toast({
+        variant: "destructive",
+        title: "Google Sign-in failed",
+        description: errorMessage,
+      });
+      
+      return {
+        error: new AuthError("Google sign-in failed", 400),
+        data: null
+      };
+    }
   };
 
   const value = {

@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { Heart, Star, MapPin, ArrowLeft } from 'lucide-react';
@@ -8,7 +7,7 @@ import { useAuth } from '@/context/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { Place } from '@/types';
+import { Place, Review } from '@/types';
 
 export default function PlaceDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -64,38 +63,52 @@ export default function PlaceDetailPage() {
     queryFn: async () => {
       if (!id) return [];
       
-      const { data, error } = await supabase
-        .from('reviews')
-        .select(`
-          *,
-          profiles:user_id (full_name, username, avatar_url)
-        `)
-        .eq('place_id', id)
-        .order('created_at', { ascending: false });
+      try {
+        // First, fetch reviews
+        const { data: reviewsData, error: reviewsError } = await supabase
+          .from('reviews')
+          .select('*')
+          .eq('place_id', id)
+          .order('created_at', { ascending: false });
+          
+        if (reviewsError) {
+          throw reviewsError;
+        }
         
-      if (error) {
+        // Map reviews and manually fetch user profiles for each review
+        const reviewsWithProfiles = await Promise.all(reviewsData.map(async (review) => {
+          // Fetch user profile for each review
+          const { data: profileData } = await supabase
+            .from('profiles')
+            .select('*')
+            .eq('id', review.user_id)
+            .single();
+            
+          return {
+            id: review.id,
+            placeId: review.place_id,
+            userId: review.user_id,
+            rating: review.rating,
+            comment: review.comment,
+            createdAt: new Date(review.created_at),
+            user: {
+              fullName: profileData?.full_name || 'Anonymous',
+              username: profileData?.username || 'user',
+              avatarUrl: profileData?.avatar_url
+            }
+          };
+        }));
+        
+        return reviewsWithProfiles;
+      } catch (error) {
         console.error('Error fetching reviews:', error);
         toast({
           variant: "destructive",
           title: "Error loading reviews",
-          description: error.message,
+          description: error instanceof Error ? error.message : "Unknown error",
         });
         return [];
       }
-      
-      return data.map(review => ({
-        id: review.id,
-        placeId: review.place_id,
-        userId: review.user_id,
-        rating: review.rating,
-        comment: review.comment,
-        createdAt: new Date(review.created_at),
-        user: {
-          fullName: review.profiles?.full_name || 'Anonymous',
-          username: review.profiles?.username || 'user',
-          avatarUrl: review.profiles?.avatar_url
-        }
-      }));
     },
     enabled: !!id,
   });
