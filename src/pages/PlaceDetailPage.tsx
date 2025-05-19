@@ -75,8 +75,8 @@ export default function PlaceDetailPage() {
           throw reviewsError;
         }
         
-        // Map reviews and manually fetch user profiles for each review
-        const reviewsWithProfiles = await Promise.all(reviewsData.map(async (review) => {
+        // Map reviews and fetch user profiles for each review
+        const reviewsWithProfiles: Review[] = await Promise.all(reviewsData.map(async (review) => {
           // Fetch user profile for each review
           const { data: profileData } = await supabase
             .from('profiles')
@@ -89,13 +89,13 @@ export default function PlaceDetailPage() {
             placeId: review.place_id,
             userId: review.user_id,
             rating: review.rating,
-            comment: review.comment,
+            comment: review.comment || '',
             createdAt: new Date(review.created_at),
-            user: {
-              fullName: profileData?.full_name || 'Anonymous',
-              username: profileData?.username || 'user',
-              avatarUrl: profileData?.avatar_url
-            }
+            user: profileData ? {
+              fullName: profileData.full_name || 'Anonymous',
+              username: profileData.username || 'user',
+              avatarUrl: profileData.avatar_url
+            } : undefined
           };
         }));
         

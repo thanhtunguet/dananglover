@@ -19,8 +19,12 @@ export interface Review {
   id: string;
   placeId: string;
   userId: string;
-  userName: string;
   rating: number;
   comment: string;
   createdAt: Date;
+  user?: {
+    fullName: string;
+    username: string;
+    avatarUrl?: string;
+  };
 }

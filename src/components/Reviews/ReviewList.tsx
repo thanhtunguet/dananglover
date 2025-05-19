@@ -1,13 +1,23 @@
 
 import { Star } from "lucide-react";
 import { Review } from "@/types";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 interface ReviewListProps {
   reviews: Review[];
+  isLoading?: boolean;
+  placeId?: string;
 }
 
-export default function ReviewList({ reviews }: ReviewListProps) {
+export default function ReviewList({ reviews, isLoading = false }: ReviewListProps) {
+  if (isLoading) {
+    return (
+      <div className="py-4 text-center">
+        <p className="text-muted-foreground">Loading reviews...</p>
+      </div>
+    );
+  }
+
   if (reviews.length === 0) {
     return (
       <div className="py-4 text-center">
@@ -22,13 +32,16 @@ export default function ReviewList({ reviews }: ReviewListProps) {
         <div key={review.id} className="border-b pb-6 last:border-0">
           <div className="flex items-start gap-4">
             <Avatar>
+              {review.user?.avatarUrl && (
+                <AvatarImage src={review.user.avatarUrl} alt={review.user.fullName || "User"} />
+              )}
               <AvatarFallback className="bg-primary/10 text-primary">
-                {review.userName.substring(0, 2).toUpperCase()}
+                {(review.user?.fullName || "User").substring(0, 2).toUpperCase()}
               </AvatarFallback>
             </Avatar>
             <div className="space-y-1.5">
               <div className="flex items-center">
-                <h4 className="font-medium">{review.userName}</h4>
+                <h4 className="font-medium">{review.user?.fullName || "Anonymous"}</h4>
                 <span className="mx-2 h-1 w-1 rounded-full bg-muted-foreground/30" />
                 <span className="text-sm text-muted-foreground">
                   {new Date(review.createdAt).toLocaleDateString()}
