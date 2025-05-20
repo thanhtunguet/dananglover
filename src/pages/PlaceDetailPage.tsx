@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
-import { useParams, Link } from "react-router-dom";
-import { Heart, Star, MapPin, ArrowLeft } from "lucide-react";
+import { useParams, Link, useNavigate } from "react-router-dom";
+import { Heart, Star, MapPin, ArrowLeft, Edit, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import ReviewList from "@/components/Reviews/ReviewList";
 import { useAuth } from "@/context/AuthContext";
@@ -19,7 +19,9 @@ export default function PlaceDetailPage() {
   const { user } = useAuth();
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const navigate = useNavigate();
   const [isSaved, setIsSaved] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   // Fetch place details
   const { data: place, isLoading: placeLoading } = useQuery({
@@ -92,16 +94,16 @@ export default function PlaceDetailPage() {
 
             return {
               id: review.id,
-              placeId: review.place_id,
-              userId: review.user_id,
+              place_id: review.place_id,
+              user_id: review.user_id,
               rating: review.rating,
               comment: review.comment || "",
-              createdAt: new Date(review.created_at),
+              created_at: new Date(review.created_at),
               user: profileData
                 ? {
-                    fullName: profileData.full_name || "Anonymous",
+                    full_name: profileData.full_name || "Anonymous",
                     username: profileData.username || "user",
-                    avatarUrl: profileData.avatar_url,
+                    avatar_url: profileData.avatar_url,
                   }
                 : undefined,
             };
@@ -192,6 +194,35 @@ export default function PlaceDetailPage() {
     },
   });
 
+  // Delete place mutation
+  const deleteMutation = useMutation({
+    mutationFn: async () => {
+      if (!id) throw new Error("Place ID is required");
+      setIsDeleting(true);
+
+      const { error } = await supabase.from("places").delete().eq("id", id);
+
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["places"] });
+      toast({
+        title: "Place deleted",
+        description: "The place has been deleted successfully.",
+      });
+      navigate("/");
+    },
+    onError: (error) => {
+      setIsDeleting(false);
+      toast({
+        variant: "destructive",
+        title: "Error deleting place",
+        description:
+          error instanceof Error ? error.message : "An error occurred",
+      });
+    },
+  });
+
   const handleToggleSave = () => {
     if (!user) {
       toast({
@@ -203,6 +234,16 @@ export default function PlaceDetailPage() {
     }
 
     saveMutation.mutate();
+  };
+
+  const handleDelete = () => {
+    if (
+      window.confirm(
+        "Are you sure you want to delete this place? This action cannot be undone."
+      )
+    ) {
+      deleteMutation.mutate();
+    }
   };
 
   if (placeLoading) {
@@ -248,14 +289,33 @@ export default function PlaceDetailPage() {
 
           <div className="flex justify-between items-center mb-4">
             <h1 className="text-3xl font-bold">{place.name}</h1>
-            <Button
-              variant={isSaved ? "default" : "outline"}
-              size="icon"
-              onClick={handleToggleSave}
-              disabled={saveMutation.isPending}
-            >
-              <Heart className={isSaved ? "fill-white" : ""} />
-            </Button>
+            <div className="flex items-center gap-2">
+              {user?.id === place.created_by && (
+                <>
+                  <Button variant="outline" size="icon" asChild>
+                    <Link to={`/places/edit/${place.id}`}>
+                      <Edit className="h-4 w-4" />
+                    </Link>
+                  </Button>
+                  <Button
+                    variant="destructive"
+                    size="icon"
+                    onClick={handleDelete}
+                    disabled={isDeleting}
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </>
+              )}
+              <Button
+                variant={isSaved ? "default" : "outline"}
+                size="icon"
+                onClick={handleToggleSave}
+                disabled={saveMutation.isPending}
+              >
+                <Heart className={isSaved ? "fill-white" : ""} />
+              </Button>
+            </div>
           </div>
 
           <div className="flex items-center gap-2 text-muted-foreground mb-2">
@@ -297,7 +357,7 @@ export default function PlaceDetailPage() {
             <ReviewList
               reviews={reviews}
               isLoading={reviewsLoading}
-              placeId={id || ""}
+              place_id={id || ""}
             />
           </div>
         </div>

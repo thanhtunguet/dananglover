@@ -22,7 +22,13 @@ export default function BlogPostPage() {
 
       try {
         // Use join syntax that works with Supabase
-        const { data, error } = await supabase
+        const {
+          data,
+          error,
+        }: {
+          data: BlogPost;
+          error: Error;
+        } = await supabase
           .from("blog_posts")
           .select(
             `
@@ -62,8 +68,9 @@ export default function BlogPostPage() {
               }
             : undefined,
           author_id: data.author_id,
-          author: data.profiles
+          profiles: data.profiles
             ? {
+                id: data.profiles.id,
                 full_name: data.profiles.full_name || "Anonymous",
                 username: data.profiles.username || "user",
                 avatar_url: data.profiles.avatar_url,

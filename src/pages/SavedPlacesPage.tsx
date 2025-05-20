@@ -39,13 +39,13 @@ export default function SavedPlacesPage() {
       }
 
       // Get the place IDs
-      const placeIds = savedData.map((saved) => saved.place_id);
+      const place_ids = savedData.map((saved) => saved.place_id);
 
       // Then fetch the actual places
       const { data: placesData, error: placesError } = await supabase
         .from("places")
         .select("*")
-        .in("id", placeIds);
+        .in("id", place_ids);
 
       if (placesError) {
         console.error("Error fetching places details:", placesError);
@@ -71,7 +71,7 @@ export default function SavedPlacesPage() {
           lng: place.lng,
         },
         createdBy: place.created_by,
-        createdAt: new Date(place.created_at),
+        created_at: new Date(place.created_at),
       })) as Place[];
     },
     enabled: !!user,

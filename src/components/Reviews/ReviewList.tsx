@@ -5,7 +5,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 interface ReviewListProps {
   reviews: Review[];
   isLoading?: boolean;
-  placeId?: string;
+  place_id?: string;
 }
 
 export default function ReviewList({

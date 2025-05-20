@@ -45,7 +45,7 @@ export default function HomePage() {
           lng: place.lng,
         },
         createdBy: place.created_by,
-        createdAt: new Date(place.created_at),
+        created_at: new Date(place.created_at),
       })) as Place[];
     },
   });

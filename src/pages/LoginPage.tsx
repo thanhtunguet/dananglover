@@ -25,7 +25,7 @@ const loginSchema = z.object({
 });
 
 const signupSchema = loginSchema.extend({
-  fullName: z.string().min(2, "Name must be at least 2 characters"),
+  full_name: z.string().min(2, "Name must be at least 2 characters"),
 });
 
 type LoginFormValues = z.infer<typeof loginSchema>;
@@ -50,14 +50,14 @@ export default function LoginPage() {
     defaultValues: {
       email: "",
       password: "",
-      fullName: "",
+      full_name: "",
     },
   });
 
   const onLogin = async (data: LoginFormValues) => {
     try {
       const { error } = await signIn(data.email, data.password);
-      
+
       if (error) {
         toast({
           variant: "destructive",
@@ -67,7 +67,7 @@ export default function LoginPage() {
         return;
       }
 
-      navigate('/profile');
+      navigate("/profile");
     } catch (error) {
       toast({
         variant: "destructive",
@@ -79,12 +79,10 @@ export default function LoginPage() {
 
   const onSignup = async (data: SignupFormValues) => {
     try {
-      const { error } = await signUp(
-        data.email, 
-        data.password, 
-        { full_name: data.fullName }
-      );
-      
+      const { error } = await signUp(data.email, data.password, {
+        full_name: data.full_name,
+      });
+
       if (error) {
         toast({
           variant: "destructive",
@@ -98,8 +96,8 @@ export default function LoginPage() {
         title: "Account created",
         description: "Please check your email to verify your account.",
       });
-      
-      navigate('/profile');
+
+      navigate("/profile");
     } catch (error) {
       toast({
         variant: "destructive",
@@ -112,8 +110,11 @@ export default function LoginPage() {
   const handleGoogleSignIn = async () => {
     try {
       const { error } = await googleSignIn();
-      
-      if (error && error.message !== "Unsupported provider: provider is not enabled") {
+
+      if (
+        error &&
+        error.message !== "Unsupported provider: provider is not enabled"
+      ) {
         toast({
           variant: "destructive",
           title: "Google Sign-in failed",
@@ -139,18 +140,26 @@ export default function LoginPage() {
       <div className="w-full max-w-md space-y-8 bg-white p-8 rounded-lg shadow-md">
         <div className="text-center">
           <h1 className="text-2xl font-bold">Welcome to Hangouts</h1>
-          <p className="text-gray-600 mt-2">Sign in to discover amazing places</p>
+          <p className="text-gray-600 mt-2">
+            Sign in to discover amazing places
+          </p>
         </div>
 
-        <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as "login" | "signup")}>
+        <Tabs
+          value={activeTab}
+          onValueChange={(v) => setActiveTab(v as "login" | "signup")}
+        >
           <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="login">Login</TabsTrigger>
             <TabsTrigger value="signup">Sign Up</TabsTrigger>
           </TabsList>
-          
+
           <TabsContent value="login" className="mt-6">
             <Form {...loginForm}>
-              <form onSubmit={loginForm.handleSubmit(onLogin)} className="space-y-4">
+              <form
+                onSubmit={loginForm.handleSubmit(onLogin)}
+                className="space-y-4"
+              >
                 <FormField
                   control={loginForm.control}
                   name="email"
@@ -158,17 +167,17 @@ export default function LoginPage() {
                     <FormItem>
                       <FormLabel>Email</FormLabel>
                       <FormControl>
-                        <Input 
-                          type="email" 
-                          placeholder="you@example.com" 
-                          {...field} 
+                        <Input
+                          type="email"
+                          placeholder="you@example.com"
+                          {...field}
                         />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
-                
+
                 <FormField
                   control={loginForm.control}
                   name="password"
@@ -176,10 +185,10 @@ export default function LoginPage() {
                     <FormItem>
                       <FormLabel>Password</FormLabel>
                       <FormControl>
-                        <Input 
-                          type="password" 
-                          placeholder="••••••••" 
-                          {...field} 
+                        <Input
+                          type="password"
+                          placeholder="••••••••"
+                          {...field}
                         />
                       </FormControl>
                       <FormMessage />
@@ -192,19 +201,21 @@ export default function LoginPage() {
                 </Button>
               </form>
             </Form>
-            
+
             <div className="mt-4">
               <div className="relative">
                 <div className="absolute inset-0 flex items-center">
                   <div className="w-full border-t border-gray-300"></div>
                 </div>
                 <div className="relative flex justify-center text-sm">
-                  <span className="bg-white px-2 text-gray-500">Or continue with</span>
+                  <span className="bg-white px-2 text-gray-500">
+                    Or continue with
+                  </span>
                 </div>
               </div>
-              
-              <Button 
-                variant="outline" 
+
+              <Button
+                variant="outline"
                 className="w-full mt-4"
                 onClick={handleGoogleSignIn}
               >
@@ -213,27 +224,27 @@ export default function LoginPage() {
               </Button>
             </div>
           </TabsContent>
-          
+
           <TabsContent value="signup" className="mt-6">
             <Form {...signupForm}>
-              <form onSubmit={signupForm.handleSubmit(onSignup)} className="space-y-4">
+              <form
+                onSubmit={signupForm.handleSubmit(onSignup)}
+                className="space-y-4"
+              >
                 <FormField
                   control={signupForm.control}
-                  name="fullName"
+                  name="full_name"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Full Name</FormLabel>
                       <FormControl>
-                        <Input 
-                          placeholder="John Doe" 
-                          {...field} 
-                        />
+                        <Input placeholder="John Doe" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
-                
+
                 <FormField
                   control={signupForm.control}
                   name="email"
@@ -241,17 +252,17 @@ export default function LoginPage() {
                     <FormItem>
                       <FormLabel>Email</FormLabel>
                       <FormControl>
-                        <Input 
-                          type="email" 
-                          placeholder="you@example.com" 
-                          {...field} 
+                        <Input
+                          type="email"
+                          placeholder="you@example.com"
+                          {...field}
                         />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
-                
+
                 <FormField
                   control={signupForm.control}
                   name="password"
@@ -259,10 +270,10 @@ export default function LoginPage() {
                     <FormItem>
                       <FormLabel>Password</FormLabel>
                       <FormControl>
-                        <Input 
-                          type="password" 
-                          placeholder="••••••••" 
-                          {...field} 
+                        <Input
+                          type="password"
+                          placeholder="••••••••"
+                          {...field}
                         />
                       </FormControl>
                       <FormMessage />
@@ -275,19 +286,21 @@ export default function LoginPage() {
                 </Button>
               </form>
             </Form>
-            
+
             <div className="mt-4">
               <div className="relative">
                 <div className="absolute inset-0 flex items-center">
                   <div className="w-full border-t border-gray-300"></div>
                 </div>
                 <div className="relative flex justify-center text-sm">
-                  <span className="bg-white px-2 text-gray-500">Or continue with</span>
+                  <span className="bg-white px-2 text-gray-500">
+                    Or continue with
+                  </span>
                 </div>
               </div>
-              
-              <Button 
-                variant="outline" 
+
+              <Button
+                variant="outline"
                 className="w-full mt-4"
                 onClick={handleGoogleSignIn}
               >

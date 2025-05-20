@@ -1,4 +1,3 @@
-
 import { useEffect, useRef, useState } from "react";
 import { Place } from "@/types";
 import L from "leaflet";
@@ -36,7 +35,7 @@ export default function MapView({
   const mapRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<L.Map | null>(null);
   const markersRef = useRef<L.Marker[]>([]);
-  const [selectedPlaceId, setSelectedPlaceId] = useState<string | null>(null);
+  const [selectedplace_id, setSelectedplace_id] = useState<string | null>(null);
 
   useEffect(() => {
     if (!mapRef.current || mapInstanceRef.current) return;
@@ -96,7 +95,7 @@ export default function MapView({
         .bindPopup(place.name);
 
       marker.on("click", () => {
-        setSelectedPlaceId(place.id);
+        setSelectedplace_id(place.id);
         onPlaceSelect?.(place);
       });
 
@@ -120,10 +119,12 @@ export default function MapView({
             <button
               key={place.id}
               className={`text-left p-2 border rounded-md hover:bg-muted/50 transition-colors ${
-                selectedPlaceId === place.id ? "bg-muted border-primary/50" : ""
+                selectedplace_id === place.id
+                  ? "bg-muted border-primary/50"
+                  : ""
               }`}
               onClick={() => {
-                setSelectedPlaceId(place.id);
+                setSelectedplace_id(place.id);
                 onPlaceSelect?.(place);
                 // Center map on selected place
                 mapInstanceRef.current?.setView(

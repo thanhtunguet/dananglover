@@ -34,7 +34,7 @@ interface BlogPostFormProps {
 interface FormValues {
   title: string;
   content: string;
-  placeId: string | "none";
+  place_id: string | "none";
   cover_image: string;
 }
 
@@ -100,7 +100,7 @@ export default function BlogPostForm({ postId }: BlogPostFormProps) {
     defaultValues: {
       title: "",
       content: "",
-      placeId: "none",
+      place_id: "none",
       cover_image: "",
     },
   });
@@ -111,7 +111,7 @@ export default function BlogPostForm({ postId }: BlogPostFormProps) {
       form.reset({
         title: post.title,
         content: post.content,
-        placeId: post.place_id || "none",
+        place_id: post.place_id || "none",
         cover_image: post.cover_image || "",
       });
     }
@@ -122,7 +122,7 @@ export default function BlogPostForm({ postId }: BlogPostFormProps) {
       if (!user) throw new Error("You must be logged in to create a post");
       setIsSubmitting(true);
 
-      const placeId = values.placeId === "none" ? null : values.placeId;
+      const place_id = values.place_id === "none" ? null : values.place_id;
 
       // First, create the post
       const { data: newPost, error: createError } = await supabase
@@ -130,7 +130,7 @@ export default function BlogPostForm({ postId }: BlogPostFormProps) {
         .insert({
           title: values.title,
           content: values.content,
-          place_id: placeId,
+          place_id: place_id,
           author_id: user.id,
           cover_image: values.cover_image || null,
           created_at: new Date().toISOString(),
@@ -167,35 +167,35 @@ export default function BlogPostForm({ postId }: BlogPostFormProps) {
         id: completePost.id,
         title: completePost.title,
         content: completePost.content,
-        placeId: completePost.place_id,
+        place_id: completePost.place_id,
         place: completePost.places
           ? {
-            id: completePost.places.id,
-            name: completePost.places.name,
-            description: completePost.places.description,
-            cover_image: completePost.places.cover_image,
-            rating: completePost.places.rating,
-            priceRange: completePost.places.price_range,
-            location: {
-              address: completePost.places.address,
-              lat: completePost.places.lat,
-              lng: completePost.places.lng,
-            },
-            createdBy: completePost.places.created_by,
-            createdAt: new Date(completePost.places.created_at),
-          }
+              id: completePost.places.id,
+              name: completePost.places.name,
+              description: completePost.places.description,
+              cover_image: completePost.places.cover_image,
+              rating: completePost.places.rating,
+              priceRange: completePost.places.price_range,
+              location: {
+                address: completePost.places.address,
+                lat: completePost.places.lat,
+                lng: completePost.places.lng,
+              },
+              createdBy: completePost.places.created_by,
+              created_at: new Date(completePost.places.created_at),
+            }
           : undefined,
         authorId: completePost.author_id,
         author: completePost.profiles
           ? {
-            fullName: completePost.profiles.full_name || "Anonymous",
-            username: completePost.profiles.username || "user",
-            avatarUrl: completePost.profiles.avatar_url,
-          }
+              full_name: completePost.profiles.full_name || "Anonymous",
+              username: completePost.profiles.username || "user",
+              avatar_url: completePost.profiles.avatar_url,
+            }
           : undefined,
         cover_image: completePost.cover_image,
-        createdAt: new Date(completePost.created_at),
-        updatedAt: new Date(completePost.updated_at),
+        created_at: new Date(completePost.created_at),
+        updated_at: new Date(completePost.updated_at),
       };
 
       return blogPost;
@@ -225,7 +225,7 @@ export default function BlogPostForm({ postId }: BlogPostFormProps) {
       if (!postId) throw new Error("Post ID is required");
       setIsSubmitting(true);
 
-      const placeId = values.placeId === "none" ? null : values.placeId;
+      const place_id = values.place_id === "none" ? null : values.place_id;
 
       // First, update the post
       const { error: updateError } = await supabase
@@ -233,7 +233,7 @@ export default function BlogPostForm({ postId }: BlogPostFormProps) {
         .update({
           title: values.title,
           content: values.content,
-          place_id: placeId,
+          place_id: place_id,
           cover_image: values.cover_image || null,
           updated_at: new Date().toISOString(),
         })
@@ -264,26 +264,26 @@ export default function BlogPostForm({ postId }: BlogPostFormProps) {
         place_id: completePost.place_id,
         place: completePost.places
           ? {
-            id: completePost.places.id,
-            name: completePost.places.name,
-            description: completePost.places.description,
-            cover_image: completePost.places.cover_image,
-            rating: completePost.places.rating,
-            priceRange: completePost.places.price_range,
-            location: {
-              address: completePost.places.address,
-              lat: completePost.places.lat,
-              lng: completePost.places.lng,
-            },
-            createdBy: completePost.places.created_by,
-            createdAt: new Date(completePost.places.created_at),
-          }
+              id: completePost.places.id,
+              name: completePost.places.name,
+              description: completePost.places.description,
+              cover_image: completePost.places.cover_image,
+              rating: completePost.places.rating,
+              priceRange: completePost.places.price_range,
+              location: {
+                address: completePost.places.address,
+                lat: completePost.places.lat,
+                lng: completePost.places.lng,
+              },
+              createdBy: completePost.places.created_by,
+              created_at: new Date(completePost.places.created_at),
+            }
           : undefined,
         authorId: completePost.author_id,
         author: completePost.profiles ? completePost.profiles : undefined,
         cover_image: completePost.cover_image,
-        createdAt: new Date(completePost.created_at),
-        updatedAt: new Date(completePost.updated_at),
+        created_at: new Date(completePost.created_at),
+        updated_at: new Date(completePost.updated_at),
       };
 
       return blogPost;
@@ -361,7 +361,7 @@ export default function BlogPostForm({ postId }: BlogPostFormProps) {
 
         <FormField
           control={form.control}
-          name="placeId"
+          name="place_id"
           render={({ field }) => (
             <FormItem>
               <FormLabel>Related Place (Optional)</FormLabel>
