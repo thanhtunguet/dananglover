@@ -1,3 +1,4 @@
+
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -26,7 +27,7 @@ export default function BlogPostPage() {
           .select(`
             *,
             places(*),
-            author:profiles!blog_posts_author_id_fkey(full_name, username, avatar_url)
+            profiles(full_name, username, avatar_url)
           `)
           .eq("id", id)
           .single();
@@ -56,10 +57,10 @@ export default function BlogPostPage() {
             createdAt: new Date(data.places.created_at),
           } : undefined,
           authorId: data.author_id,
-          author: data.author && data.author.length > 0 ? {
-            fullName: data.author[0]?.full_name || "Anonymous",
-            username: data.author[0]?.username || "user",
-            avatarUrl: data.author[0]?.avatar_url,
+          author: data.profiles ? {
+            fullName: data.profiles.full_name || "Anonymous",
+            username: data.profiles.username || "user",
+            avatarUrl: data.profiles.avatar_url,
           } : undefined,
           coverImage: data.cover_image,
           createdAt: new Date(data.created_at),
