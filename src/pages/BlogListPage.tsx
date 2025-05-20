@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
@@ -52,10 +51,10 @@ export default function BlogListPage() {
             createdAt: new Date(post.places.created_at),
           } : undefined,
           authorId: post.author_id,
-          author: post.author?.length ? {
-            fullName: post.author[0].full_name || "Anonymous",
-            username: post.author[0].username || "user",
-            avatarUrl: post.author[0].avatar_url,
+          author: post.author && post.author.length > 0 ? {
+            fullName: post.author[0]?.full_name || "Anonymous",
+            username: post.author[0]?.username || "user",
+            avatarUrl: post.author[0]?.avatar_url,
           } : undefined,
           coverImage: post.cover_image,
           createdAt: new Date(post.created_at),

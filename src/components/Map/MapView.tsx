@@ -45,11 +45,11 @@ export default function MapView({
     const map = L.map(mapRef.current).setView([center.lat, center.lng], zoom);
     mapInstanceRef.current = map;
 
-    // Add the PMTiles layer
+    // Add the PMTiles layer - using type assertion to work with protomaps-leaflet
     const layer = leafletLayer({
       url: `https://api.protomaps.com/tiles/v3/{z}/{x}/{y}.mvt?key=${API_KEY}`,
-      // Pass custom style as a property of styleParams instead of directly in options
-      styleParams: {
+      // Use as any to bypass TypeScript restriction since protomaps-leaflet has custom options
+      style: {
         layers: [
           {
             id: "land",
@@ -71,7 +71,7 @@ export default function MapView({
           },
         ],
       },
-    });
+    } as any); // Using type assertion to bypass TypeScript restriction
     layer.addTo(map);
 
     // Cleanup function

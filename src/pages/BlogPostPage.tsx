@@ -1,4 +1,3 @@
-
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -57,10 +56,10 @@ export default function BlogPostPage() {
             createdAt: new Date(data.places.created_at),
           } : undefined,
           authorId: data.author_id,
-          author: data.author?.length ? {
-            fullName: data.author[0].full_name || "Anonymous",
-            username: data.author[0].username || "user",
-            avatarUrl: data.author[0].avatar_url,
+          author: data.author && data.author.length > 0 ? {
+            fullName: data.author[0]?.full_name || "Anonymous",
+            username: data.author[0]?.username || "user",
+            avatarUrl: data.author[0]?.avatar_url,
           } : undefined,
           coverImage: data.cover_image,
           createdAt: new Date(data.created_at),
