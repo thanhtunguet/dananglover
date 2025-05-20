@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
@@ -34,7 +33,7 @@ interface BlogPostFormProps {
 interface FormValues {
   title: string;
   content: string;
-  placeId: string;
+  placeId: string | "none";
   coverImage: string;
 }
 
@@ -100,7 +99,7 @@ export default function BlogPostForm({ postId }: BlogPostFormProps) {
     defaultValues: {
       title: "",
       content: "",
-      placeId: "",
+      placeId: "none",
       coverImage: "",
     },
   });
@@ -111,7 +110,7 @@ export default function BlogPostForm({ postId }: BlogPostFormProps) {
       form.reset({
         title: post.title,
         content: post.content,
-        placeId: post.place_id || "",
+        placeId: post.place_id || "none",
         coverImage: post.cover_image || "",
       });
     }
@@ -127,7 +126,7 @@ export default function BlogPostForm({ postId }: BlogPostFormProps) {
         .insert({
           title: values.title,
           content: values.content,
-          place_id: values.placeId || null,
+          place_id: values.placeId === "none" ? null : values.placeId,
           author_id: user.id,
           cover_image: values.coverImage || null,
         })
@@ -150,7 +149,8 @@ export default function BlogPostForm({ postId }: BlogPostFormProps) {
       toast({
         variant: "destructive",
         title: "Error creating post",
-        description: error instanceof Error ? error.message : "An error occurred",
+        description:
+          error instanceof Error ? error.message : "An error occurred",
       });
     },
   });
@@ -165,7 +165,7 @@ export default function BlogPostForm({ postId }: BlogPostFormProps) {
         .update({
           title: values.title,
           content: values.content,
-          place_id: values.placeId || null,
+          place_id: values.placeId === "none" ? null : values.placeId,
           cover_image: values.coverImage || null,
           updated_at: new Date().toISOString(),
         })
@@ -188,7 +188,8 @@ export default function BlogPostForm({ postId }: BlogPostFormProps) {
       toast({
         variant: "destructive",
         title: "Error updating post",
-        description: error instanceof Error ? error.message : "An error occurred",
+        description:
+          error instanceof Error ? error.message : "An error occurred",
       });
     },
   });
@@ -225,10 +226,10 @@ export default function BlogPostForm({ postId }: BlogPostFormProps) {
             <FormItem>
               <FormLabel>Content</FormLabel>
               <FormControl>
-                <Textarea 
-                  placeholder="Write your blog post content here..." 
-                  className="min-h-[300px]" 
-                  {...field} 
+                <Textarea
+                  placeholder="Write your blog post content here..."
+                  className="min-h-[300px]"
+                  {...field}
                 />
               </FormControl>
               <FormDescription>
@@ -245,8 +246,8 @@ export default function BlogPostForm({ postId }: BlogPostFormProps) {
           render={({ field }) => (
             <FormItem>
               <FormLabel>Related Place (Optional)</FormLabel>
-              <Select 
-                onValueChange={field.onChange} 
+              <Select
+                onValueChange={field.onChange}
                 defaultValue={field.value}
                 value={field.value}
               >
@@ -256,7 +257,7 @@ export default function BlogPostForm({ postId }: BlogPostFormProps) {
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
-                  <SelectItem value="">None</SelectItem>
+                  <SelectItem value="none">None</SelectItem>
                   {places.map((place: any) => (
                     <SelectItem key={place.id} value={place.id}>
                       {place.name}
@@ -290,10 +291,7 @@ export default function BlogPostForm({ postId }: BlogPostFormProps) {
         />
 
         <div className="flex justify-end">
-          <Button 
-            type="submit" 
-            disabled={isSubmitting}
-          >
+          <Button type="submit" disabled={isSubmitting}>
             {isEditing ? "Update Post" : "Create Post"}
           </Button>
         </div>
