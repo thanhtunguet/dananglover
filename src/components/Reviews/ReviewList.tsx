@@ -34,14 +34,14 @@ export default function ReviewList({
         <div key={review.id} className="border-b pb-6 last:border-0">
           <div className="flex items-start gap-4">
             <Avatar>
-              {review.user?.avatarUrl && (
+              {review.user?.avatar_url && (
                 <AvatarImage
-                  src={review.user.avatarUrl}
-                  alt={review.user.fullName || "User"}
+                  src={review.user.avatar_url}
+                  alt={review.user.full_name || "User"}
                 />
               )}
               <AvatarFallback className="bg-primary/10 text-primary">
-                {(review.user?.fullName || "User")
+                {(review.user?.full_name || "User")
                   .substring(0, 2)
                   .toUpperCase()}
               </AvatarFallback>
@@ -49,11 +49,11 @@ export default function ReviewList({
             <div className="space-y-1.5">
               <div className="flex items-center">
                 <h4 className="font-medium">
-                  {review.user?.fullName || "Anonymous"}
+                  {review.user?.full_name || "Anonymous"}
                 </h4>
                 <span className="mx-2 h-1 w-1 rounded-full bg-muted-foreground/30" />
                 <span className="text-sm text-muted-foreground">
-                  {new Date(review.createdAt)?.toLocaleDateString()}
+                  {new Date(review.created_at)?.toLocaleDateString()}
                 </span>
               </div>
               <div className="flex">

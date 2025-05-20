@@ -47,14 +47,14 @@ export function BlogPostHeader({
       <h1 className="text-3xl font-bold mb-4">{post.title}</h1>
 
       <div className="flex items-center text-sm text-muted-foreground mb-6">
-        <span>By {post.author?.fullName || "Anonymous"}</span>
+        <span>By {post.profiles?.full_name || "Anonymous"}</span>
         <span className="mx-2">•</span>
-        <span>{post.createdAt?.toLocaleDateString()}</span>
-        {post.place && (
+        <span>{new Date(post.created_at)?.toLocaleDateString()}</span>
+        {post.places && (
           <>
             <span className="mx-2">•</span>
-            <Link to={`/places/${post.placeId}`} className="hover:underline">
-              {post.place.name}
+            <Link to={`/places/${post.place_id}`} className="hover:underline">
+              {post.places.name}
             </Link>
           </>
         )}

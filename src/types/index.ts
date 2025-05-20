@@ -1,47 +1,48 @@
-
 export interface Place {
   id: string;
   name: string;
   description: string;
-  coverImage: string;
+  address?: string;
+  lat?: number;
+  lng?: number;
+  cover_image: string;
   rating: number;
-  priceRange: 1 | 2 | 3; // 1=$, 2=$$, 3=$$$
+  price_range: 1 | 2 | 3; // 1=$, 2=$$, 3=$$$
   location: {
     address: string;
     lat: number;
     lng: number;
   };
-  createdBy?: string;
-  createdAt: Date;
+  created_by?: string;
+  created_at: Date;
 }
 
 export interface Review {
   id: string;
-  placeId: string;
-  userId: string;
+  place_id: string;
+  user_id: string;
   rating: number;
   comment: string;
-  createdAt: Date;
-  user?: {
-    fullName: string;
-    username: string;
-    avatarUrl?: string;
-  };
+  created_at: Date;
+  user?: Profile;
 }
 
 export interface BlogPost {
   id: string;
   title: string;
   content: string;
-  placeId?: string;
-  place?: Place;
-  authorId: string;
-  author?: {
-    fullName: string;
-    username: string;
-    avatarUrl?: string;
-  };
-  coverImage?: string;
-  createdAt: Date;
-  updatedAt: Date;
+  place_id?: string;
+  places?: Place;
+  author_id: string;
+  profiles?: Profile;
+  cover_image?: string;
+  created_at: Date;
+  updated_at: Date;
+}
+
+export interface Profile {
+  id: string;
+  full_name: string;
+  username: string;
+  avatar_url?: string;
 }

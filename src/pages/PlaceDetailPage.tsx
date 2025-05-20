@@ -48,16 +48,16 @@ export default function PlaceDetailPage() {
         id: data.id,
         name: data.name,
         description: data.description,
-        coverImage: data.cover_image,
+        cover_image: data.cover_image,
         rating: data.rating,
-        priceRange: data.price_range as 1 | 2 | 3,
+        price_range: data.price_range as 1 | 2 | 3,
         location: {
           address: data.address,
           lat: data.lat,
           lng: data.lng,
         },
-        createdBy: data.created_by,
-        createdAt: new Date(data.created_at),
+        created_by: data.created_by,
+        created_at: new Date(data.created_at),
       } as Place;
     },
   });
@@ -240,7 +240,7 @@ export default function PlaceDetailPage() {
         <div className="md:col-span-2">
           <div className="relative h-[300px] rounded-lg overflow-hidden mb-6">
             <img
-              src={place.coverImage || "/placeholder.svg"}
+              src={place.cover_image || "/placeholder.svg"}
               alt={place.name}
               className="w-full h-full object-cover"
             />
@@ -281,7 +281,7 @@ export default function PlaceDetailPage() {
             </span>
             <span className="text-muted-foreground">
               {/* Price range display */}
-              {Array.from({ length: place.priceRange }).map((_, i) => (
+              {Array.from({ length: place.price_range }).map((_, i) => (
                 <span key={i}>$</span>
               ))}
             </span>

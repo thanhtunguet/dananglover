@@ -25,6 +25,7 @@ import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import MDEditor from "@uiw/react-md-editor";
 import { cn } from "@/lib/utils";
+import type { BlogPost, Place } from "@/types";
 
 interface BlogPostFormProps {
   postId?: string;
@@ -141,7 +142,13 @@ export default function BlogPostForm({ postId }: BlogPostFormProps) {
       if (createError) throw createError;
 
       // Then, fetch the complete post data
-      const { data: completePost, error: fetchError } = await supabase
+      const {
+        data: completePost,
+        error: fetchError,
+      }: {
+        data: BlogPost;
+        error: Error;
+      } = await supabase
         .from("blog_posts")
         .select(
           `
@@ -163,28 +170,28 @@ export default function BlogPostForm({ postId }: BlogPostFormProps) {
         placeId: completePost.place_id,
         place: completePost.places
           ? {
-              id: completePost.places.id,
-              name: completePost.places.name,
-              description: completePost.places.description,
-              coverImage: completePost.places.cover_image,
-              rating: completePost.places.rating,
-              priceRange: completePost.places.price_range,
-              location: {
-                address: completePost.places.address,
-                lat: completePost.places.lat,
-                lng: completePost.places.lng,
-              },
-              createdBy: completePost.places.created_by,
-              createdAt: new Date(completePost.places.created_at),
-            }
+            id: completePost.places.id,
+            name: completePost.places.name,
+            description: completePost.places.description,
+            coverImage: completePost.places.cover_image,
+            rating: completePost.places.rating,
+            priceRange: completePost.places.price_range,
+            location: {
+              address: completePost.places.address,
+              lat: completePost.places.lat,
+              lng: completePost.places.lng,
+            },
+            createdBy: completePost.places.created_by,
+            createdAt: new Date(completePost.places.created_at),
+          }
           : undefined,
         authorId: completePost.author_id,
         author: completePost.profiles
           ? {
-              fullName: completePost.profiles.full_name || "Anonymous",
-              username: completePost.profiles.username || "user",
-              avatarUrl: completePost.profiles.avatar_url,
-            }
+            fullName: completePost.profiles.full_name || "Anonymous",
+            username: completePost.profiles.username || "user",
+            avatarUrl: completePost.profiles.avatar_url,
+          }
           : undefined,
         coverImage: completePost.cover_image,
         createdAt: new Date(completePost.created_at),
@@ -254,32 +261,26 @@ export default function BlogPostForm({ postId }: BlogPostFormProps) {
         id: completePost.id,
         title: completePost.title,
         content: completePost.content,
-        placeId: completePost.place_id,
+        place_id: completePost.place_id,
         place: completePost.places
           ? {
-              id: completePost.places.id,
-              name: completePost.places.name,
-              description: completePost.places.description,
-              coverImage: completePost.places.cover_image,
-              rating: completePost.places.rating,
-              priceRange: completePost.places.price_range,
-              location: {
-                address: completePost.places.address,
-                lat: completePost.places.lat,
-                lng: completePost.places.lng,
-              },
-              createdBy: completePost.places.created_by,
-              createdAt: new Date(completePost.places.created_at),
-            }
+            id: completePost.places.id,
+            name: completePost.places.name,
+            description: completePost.places.description,
+            coverImage: completePost.places.cover_image,
+            rating: completePost.places.rating,
+            priceRange: completePost.places.price_range,
+            location: {
+              address: completePost.places.address,
+              lat: completePost.places.lat,
+              lng: completePost.places.lng,
+            },
+            createdBy: completePost.places.created_by,
+            createdAt: new Date(completePost.places.created_at),
+          }
           : undefined,
         authorId: completePost.author_id,
-        author: completePost.profiles
-          ? {
-              fullName: completePost.profiles.full_name || "Anonymous",
-              username: completePost.profiles.username || "user",
-              avatarUrl: completePost.profiles.avatar_url,
-            }
-          : undefined,
+        author: completePost.profiles ? completePost.profiles : undefined,
         coverImage: completePost.cover_image,
         createdAt: new Date(completePost.created_at),
         updatedAt: new Date(completePost.updated_at),
@@ -376,7 +377,7 @@ export default function BlogPostForm({ postId }: BlogPostFormProps) {
                 </FormControl>
                 <SelectContent>
                   <SelectItem value="none">None</SelectItem>
-                  {places.map((place: any) => (
+                  {places.map((place: Place) => (
                     <SelectItem key={place.id} value={place.id}>
                       {place.name}
                     </SelectItem>

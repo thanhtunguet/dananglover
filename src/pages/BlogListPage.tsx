@@ -44,35 +44,35 @@ export default function BlogListPage() {
             id: post.id,
             title: post.title,
             content: post.content,
-            placeId: post.place_id,
-            place: post.places
+            place_id: post.place_id,
+            places: post.places
               ? {
                   id: post.places.id,
                   name: post.places.name,
                   description: post.places.description,
-                  coverImage: post.places.cover_image,
+                  cover_image: post.places.cover_image,
                   rating: post.places.rating,
-                  priceRange: post.places.price_range,
+                  price_range: post.places.price_range,
                   location: {
                     address: post.places.address,
                     lat: post.places.lat,
                     lng: post.places.lng,
                   },
-                  createdBy: post.places.created_by,
-                  createdAt: new Date(post.places.created_at),
+                  created_by: post.places.created_by,
+                  created_at: new Date(post.places.created_at),
                 }
               : undefined,
-            authorId: post.author_id,
+            author_id: post.author_id,
             author: post.profiles
               ? {
-                  fullName: post.profiles.full_name || "Anonymous",
+                  full_name: post.profiles.full_name || "Anonymous",
                   username: post.profiles.username || "user",
-                  avatarUrl: post.profiles.avatar_url,
+                  avatar_url: post.profiles.avatar_url,
                 }
               : undefined,
-            coverImage: post.cover_image,
-            createdAt: new Date(post.created_at),
-            updatedAt: new Date(post.updated_at),
+            cover_image: post.cover_image,
+            created_at: new Date(post.created_at),
+            updated_at: new Date(post.updated_at),
           };
 
           return blogPost;
@@ -123,10 +123,10 @@ export default function BlogListPage() {
           {blogPosts.map((post) => (
             <Link to={`/blog/${post.id}`} key={post.id}>
               <Card className="h-full overflow-hidden hover:shadow-lg transition-shadow">
-                {post.coverImage ? (
+                {post.cover_image ? (
                   <div className="aspect-video overflow-hidden">
                     <img
-                      src={post.coverImage}
+                      src={post.cover_image}
                       alt={post.title}
                       className="w-full h-full object-cover transition-transform hover:scale-105"
                     />
@@ -145,10 +145,10 @@ export default function BlogListPage() {
                 </CardContent>
                 <CardFooter className="flex justify-between">
                   <div className="text-sm text-muted-foreground">
-                    {post.author?.fullName || "Anonymous"}
+                    {post.author?.full_name || "Anonymous"}
                   </div>
                   <div className="text-sm text-muted-foreground">
-                    {new Date(post.createdAt)?.toLocaleDateString()}
+                    {new Date(post.created_at)?.toLocaleDateString()}
                   </div>
                 </CardFooter>
               </Card>

@@ -1,4 +1,3 @@
-
 import { useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -25,11 +24,13 @@ export default function BlogPostPage() {
         // Use join syntax that works with Supabase
         const { data, error } = await supabase
           .from("blog_posts")
-          .select(`
+          .select(
+            `
             *,
             places(*),
             profiles(full_name, username, avatar_url)
-          `)
+          `
+          )
           .eq("id", id)
           .single();
 
@@ -42,31 +43,35 @@ export default function BlogPostPage() {
           id: data.id,
           title: data.title,
           content: data.content,
-          placeId: data.place_id,
-          place: data.places ? {
-            id: data.places.id,
-            name: data.places.name,
-            description: data.places.description,
-            coverImage: data.places.cover_image,
-            rating: data.places.rating,
-            priceRange: data.places.price_range,
-            location: {
-              address: data.places.address,
-              lat: data.places.lat,
-              lng: data.places.lng,
-            },
-            createdBy: data.places.created_by,
-            createdAt: new Date(data.places.created_at),
-          } : undefined,
-          authorId: data.author_id,
-          author: data.profiles ? {
-            fullName: data.profiles.full_name || "Anonymous",
-            username: data.profiles.username || "user",
-            avatarUrl: data.profiles.avatar_url,
-          } : undefined,
-          coverImage: data.cover_image,
-          createdAt: new Date(data.created_at),
-          updatedAt: new Date(data.updated_at),
+          place_id: data.place_id,
+          places: data.places
+            ? {
+                id: data.places.id,
+                name: data.places.name,
+                description: data.places.description,
+                cover_image: data.places.cover_image,
+                rating: data.places.rating,
+                price_range: data.places.price_range,
+                location: {
+                  address: data.places.address,
+                  lat: data.places.lat,
+                  lng: data.places.lng,
+                },
+                created_by: data.places.created_by,
+                created_at: new Date(data.places.created_at),
+              }
+            : undefined,
+          author_id: data.author_id,
+          author: data.profiles
+            ? {
+                full_name: data.profiles.full_name || "Anonymous",
+                username: data.profiles.username || "user",
+                avatar_url: data.profiles.avatar_url,
+              }
+            : undefined,
+          cover_image: data.cover_image,
+          created_at: new Date(data.created_at),
+          updated_at: new Date(data.updated_at),
         };
 
         return blogPost;
@@ -75,7 +80,8 @@ export default function BlogPostPage() {
         toast({
           variant: "destructive",
           title: "Error fetching blog post",
-          description: error instanceof Error ? error.message : "An error occurred",
+          description:
+            error instanceof Error ? error.message : "An error occurred",
         });
         return null;
       }
@@ -90,17 +96,17 @@ export default function BlogPostPage() {
     return <BlogPostNotFound />;
   }
 
-  const isAuthor = user?.id === post.authorId;
+  const isAuthor = user?.id === post.author_id;
 
   return (
     <div className="container py-8 max-w-4xl mx-auto">
-      <BlogPostHeader 
-        post={post} 
-        isAuthor={isAuthor} 
-        isDeleting={isDeleting} 
-        onDelete={() => handleDelete(post.id)} 
+      <BlogPostHeader
+        post={post}
+        isAuthor={isAuthor}
+        isDeleting={isDeleting}
+        onDelete={() => handleDelete(post.id)}
       />
-      
+
       <BlogPostContent post={post} />
     </div>
   );

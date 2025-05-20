@@ -35,10 +35,10 @@ export function BlogPostContent({ post }: BlogPostContentProps) {
 
   return (
     <>
-      {post.coverImage && (
+      {post.cover_image && (
         <div className="mb-8 rounded-lg overflow-hidden">
           <img
-            src={post.coverImage}
+            src={post.cover_image}
             alt={post.title}
             className="w-full h-auto object-cover"
           />
