@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -12,7 +11,12 @@ interface BlogPostHeaderProps {
   onDelete: () => void;
 }
 
-export function BlogPostHeader({ post, isAuthor, isDeleting, onDelete }: BlogPostHeaderProps) {
+export function BlogPostHeader({
+  post,
+  isAuthor,
+  isDeleting,
+  onDelete,
+}: BlogPostHeaderProps) {
   return (
     <div className="mb-8">
       <div className="flex items-center justify-between mb-6">
@@ -21,7 +25,7 @@ export function BlogPostHeader({ post, isAuthor, isDeleting, onDelete }: BlogPos
             <ArrowLeft className="mr-2 h-4 w-4" /> Back to blog
           </Link>
         </Button>
-        
+
         {isAuthor && (
           <div className="flex gap-2">
             <Button variant="outline" asChild>
@@ -29,8 +33,8 @@ export function BlogPostHeader({ post, isAuthor, isDeleting, onDelete }: BlogPos
                 <Edit className="mr-2 h-4 w-4" /> Edit
               </Link>
             </Button>
-            <Button 
-              variant="destructive" 
+            <Button
+              variant="destructive"
               onClick={onDelete}
               disabled={isDeleting}
             >
@@ -39,13 +43,13 @@ export function BlogPostHeader({ post, isAuthor, isDeleting, onDelete }: BlogPos
           </div>
         )}
       </div>
-      
+
       <h1 className="text-3xl font-bold mb-4">{post.title}</h1>
-      
+
       <div className="flex items-center text-sm text-muted-foreground mb-6">
         <span>By {post.author?.fullName || "Anonymous"}</span>
         <span className="mx-2">•</span>
-        <span>{post.createdAt.toLocaleDateString()}</span>
+        <span>{post.createdAt?.toLocaleDateString()}</span>
         {post.place && (
           <>
             <span className="mx-2">•</span>

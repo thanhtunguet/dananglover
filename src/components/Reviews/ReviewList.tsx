@@ -1,4 +1,3 @@
-
 import { Star } from "lucide-react";
 import { Review } from "@/types";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -9,7 +8,10 @@ interface ReviewListProps {
   placeId?: string;
 }
 
-export default function ReviewList({ reviews, isLoading = false }: ReviewListProps) {
+export default function ReviewList({
+  reviews,
+  isLoading = false,
+}: ReviewListProps) {
   if (isLoading) {
     return (
       <div className="py-4 text-center">
@@ -33,25 +35,36 @@ export default function ReviewList({ reviews, isLoading = false }: ReviewListPro
           <div className="flex items-start gap-4">
             <Avatar>
               {review.user?.avatarUrl && (
-                <AvatarImage src={review.user.avatarUrl} alt={review.user.fullName || "User"} />
+                <AvatarImage
+                  src={review.user.avatarUrl}
+                  alt={review.user.fullName || "User"}
+                />
               )}
               <AvatarFallback className="bg-primary/10 text-primary">
-                {(review.user?.fullName || "User").substring(0, 2).toUpperCase()}
+                {(review.user?.fullName || "User")
+                  .substring(0, 2)
+                  .toUpperCase()}
               </AvatarFallback>
             </Avatar>
             <div className="space-y-1.5">
               <div className="flex items-center">
-                <h4 className="font-medium">{review.user?.fullName || "Anonymous"}</h4>
+                <h4 className="font-medium">
+                  {review.user?.fullName || "Anonymous"}
+                </h4>
                 <span className="mx-2 h-1 w-1 rounded-full bg-muted-foreground/30" />
                 <span className="text-sm text-muted-foreground">
-                  {new Date(review.createdAt).toLocaleDateString()}
+                  {new Date(review.createdAt)?.toLocaleDateString()}
                 </span>
               </div>
               <div className="flex">
                 {[...Array(5)].map((_, i) => (
-                  <Star 
-                    key={i} 
-                    className={`h-4 w-4 ${i < review.rating ? 'fill-yellow-400 text-yellow-400' : 'text-gray-300'}`}
+                  <Star
+                    key={i}
+                    className={`h-4 w-4 ${
+                      i < review.rating
+                        ? "fill-yellow-400 text-yellow-400"
+                        : "text-gray-300"
+                    }`}
                   />
                 ))}
               </div>

@@ -1,10 +1,3 @@
-import { useState, useEffect } from "react";
-import { useForm } from "react-hook-form";
-import { useNavigate } from "react-router-dom";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
-import { useAuth } from "@/context/AuthContext";
-import { toast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -16,7 +9,6 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import {
   Select,
   SelectContent,
@@ -24,7 +16,15 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { BlogPost, Place } from "@/types";
+import { useAuth } from "@/context/AuthContext";
+import { toast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useEffect, useState } from "react";
+import { useForm } from "react-hook-form";
+import { useNavigate } from "react-router-dom";
+import MDEditor from "@uiw/react-md-editor";
+import { cn } from "@/lib/utils";
 
 interface BlogPostFormProps {
   postId?: string;
@@ -121,23 +121,81 @@ export default function BlogPostForm({ postId }: BlogPostFormProps) {
       if (!user) throw new Error("You must be logged in to create a post");
       setIsSubmitting(true);
 
-      const { data, error } = await supabase
+      const placeId = values.placeId === "none" ? null : values.placeId;
+
+      // First, create the post
+      const { data: newPost, error: createError } = await supabase
         .from("blog_posts")
         .insert({
           title: values.title,
           content: values.content,
-          place_id: values.placeId === "none" ? null : values.placeId,
+          place_id: placeId,
           author_id: user.id,
           cover_image: values.coverImage || null,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
         })
         .select("id")
         .single();
 
-      if (error) throw error;
-      return data;
+      if (createError) throw createError;
+
+      // Then, fetch the complete post data
+      const { data: completePost, error: fetchError } = await supabase
+        .from("blog_posts")
+        .select(
+          `
+          *,
+          places(*),
+          profiles(full_name, username, avatar_url)
+        `
+        )
+        .eq("id", newPost.id)
+        .single();
+
+      if (fetchError) throw fetchError;
+
+      // Transform the data to match the BlogPost type
+      const blogPost = {
+        id: completePost.id,
+        title: completePost.title,
+        content: completePost.content,
+        placeId: completePost.place_id,
+        place: completePost.places
+          ? {
+              id: completePost.places.id,
+              name: completePost.places.name,
+              description: completePost.places.description,
+              coverImage: completePost.places.cover_image,
+              rating: completePost.places.rating,
+              priceRange: completePost.places.price_range,
+              location: {
+                address: completePost.places.address,
+                lat: completePost.places.lat,
+                lng: completePost.places.lng,
+              },
+              createdBy: completePost.places.created_by,
+              createdAt: new Date(completePost.places.created_at),
+            }
+          : undefined,
+        authorId: completePost.author_id,
+        author: completePost.profiles
+          ? {
+              fullName: completePost.profiles.full_name || "Anonymous",
+              username: completePost.profiles.username || "user",
+              avatarUrl: completePost.profiles.avatar_url,
+            }
+          : undefined,
+        coverImage: completePost.cover_image,
+        createdAt: new Date(completePost.created_at),
+        updatedAt: new Date(completePost.updated_at),
+      };
+
+      return blogPost;
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ["blogPosts"] });
+      queryClient.setQueryData(["blogPost", data.id], data);
       toast({
         title: "Post created",
         description: "Your blog post has been created successfully.",
@@ -160,23 +218,78 @@ export default function BlogPostForm({ postId }: BlogPostFormProps) {
       if (!postId) throw new Error("Post ID is required");
       setIsSubmitting(true);
 
-      const { error } = await supabase
+      const placeId = values.placeId === "none" ? null : values.placeId;
+
+      // First, update the post
+      const { error: updateError } = await supabase
         .from("blog_posts")
         .update({
           title: values.title,
           content: values.content,
-          place_id: values.placeId === "none" ? null : values.placeId,
+          place_id: placeId,
           cover_image: values.coverImage || null,
           updated_at: new Date().toISOString(),
         })
         .eq("id", postId);
 
-      if (error) throw error;
-      return { id: postId };
+      if (updateError) throw updateError;
+
+      // Then, fetch the complete post data
+      const { data: completePost, error: fetchError } = await supabase
+        .from("blog_posts")
+        .select(
+          `
+          *,
+          places(*),
+          profiles(full_name, username, avatar_url)
+        `
+        )
+        .eq("id", postId)
+        .single();
+
+      if (fetchError) throw fetchError;
+
+      // Transform the data to match the BlogPost type
+      const blogPost = {
+        id: completePost.id,
+        title: completePost.title,
+        content: completePost.content,
+        placeId: completePost.place_id,
+        place: completePost.places
+          ? {
+              id: completePost.places.id,
+              name: completePost.places.name,
+              description: completePost.places.description,
+              coverImage: completePost.places.cover_image,
+              rating: completePost.places.rating,
+              priceRange: completePost.places.price_range,
+              location: {
+                address: completePost.places.address,
+                lat: completePost.places.lat,
+                lng: completePost.places.lng,
+              },
+              createdBy: completePost.places.created_by,
+              createdAt: new Date(completePost.places.created_at),
+            }
+          : undefined,
+        authorId: completePost.author_id,
+        author: completePost.profiles
+          ? {
+              fullName: completePost.profiles.full_name || "Anonymous",
+              username: completePost.profiles.username || "user",
+              avatarUrl: completePost.profiles.avatar_url,
+            }
+          : undefined,
+        coverImage: completePost.cover_image,
+        createdAt: new Date(completePost.created_at),
+        updatedAt: new Date(completePost.updated_at),
+      };
+
+      return blogPost;
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ["blogPosts"] });
-      queryClient.invalidateQueries({ queryKey: ["blogPost", postId] });
+      queryClient.setQueryData(["blogPost", data.id], data);
       toast({
         title: "Post updated",
         description: "Your blog post has been updated successfully.",
@@ -226,14 +339,19 @@ export default function BlogPostForm({ postId }: BlogPostFormProps) {
             <FormItem>
               <FormLabel>Content</FormLabel>
               <FormControl>
-                <Textarea
-                  placeholder="Write your blog post content here..."
-                  className="min-h-[300px]"
-                  {...field}
-                />
+                <div data-color-mode="light" className={cn("min-h-[300px]")}>
+                  <MDEditor
+                    value={field.value}
+                    onChange={(value) => field.onChange(value || "")}
+                    preview="edit"
+                    height={300}
+                    className="w-full"
+                  />
+                </div>
               </FormControl>
               <FormDescription>
-                You can use HTML formatting if you're familiar with it.
+                Write your content using Markdown syntax. You can use # for
+                headings, * for lists, and more.
               </FormDescription>
               <FormMessage />
             </FormItem>

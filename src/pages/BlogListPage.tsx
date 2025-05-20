@@ -1,9 +1,14 @@
-
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
@@ -20,50 +25,56 @@ export default function BlogListPage() {
       try {
         const { data, error } = await supabase
           .from("blog_posts")
-          .select(`
+          .select(
+            `
             *,
             places(*),
             profiles(full_name, username, avatar_url)
-          `)
+          `
+          )
           .order("created_at", { ascending: false });
 
         if (error) {
           throw error;
         }
 
-        return data.map(post => {
+        return data.map((post) => {
           // Map the Supabase response to our BlogPost type
           const blogPost: BlogPost = {
             id: post.id,
             title: post.title,
             content: post.content,
             placeId: post.place_id,
-            place: post.places ? {
-              id: post.places.id,
-              name: post.places.name,
-              description: post.places.description,
-              coverImage: post.places.cover_image,
-              rating: post.places.rating,
-              priceRange: post.places.price_range,
-              location: {
-                address: post.places.address,
-                lat: post.places.lat,
-                lng: post.places.lng,
-              },
-              createdBy: post.places.created_by,
-              createdAt: new Date(post.places.created_at),
-            } : undefined,
+            place: post.places
+              ? {
+                  id: post.places.id,
+                  name: post.places.name,
+                  description: post.places.description,
+                  coverImage: post.places.cover_image,
+                  rating: post.places.rating,
+                  priceRange: post.places.price_range,
+                  location: {
+                    address: post.places.address,
+                    lat: post.places.lat,
+                    lng: post.places.lng,
+                  },
+                  createdBy: post.places.created_by,
+                  createdAt: new Date(post.places.created_at),
+                }
+              : undefined,
             authorId: post.author_id,
-            author: post.profiles ? {
-              fullName: post.profiles.full_name || "Anonymous",
-              username: post.profiles.username || "user",
-              avatarUrl: post.profiles.avatar_url,
-            } : undefined,
+            author: post.profiles
+              ? {
+                  fullName: post.profiles.full_name || "Anonymous",
+                  username: post.profiles.username || "user",
+                  avatarUrl: post.profiles.avatar_url,
+                }
+              : undefined,
             coverImage: post.cover_image,
             createdAt: new Date(post.created_at),
             updatedAt: new Date(post.updated_at),
           };
-          
+
           return blogPost;
         });
       } catch (error) {
@@ -71,7 +82,8 @@ export default function BlogListPage() {
         toast({
           variant: "destructive",
           title: "Error fetching blog posts",
-          description: error instanceof Error ? error.message : "An error occurred",
+          description:
+            error instanceof Error ? error.message : "An error occurred",
         });
         return [];
       }
@@ -93,7 +105,7 @@ export default function BlogListPage() {
 
       {isLoading ? (
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {[1, 2, 3].map(i => (
+          {[1, 2, 3].map((i) => (
             <Card key={i} className="overflow-hidden">
               <div className="h-48 bg-muted animate-pulse" />
               <CardHeader>
@@ -127,16 +139,16 @@ export default function BlogListPage() {
                 </CardHeader>
                 <CardContent>
                   <p className="text-muted-foreground line-clamp-3">
-                    {post.content.replace(/<[^>]*>?/gm, '').substring(0, 150)}
-                    {post.content.length > 150 ? '...' : ''}
+                    {post.content.replace(/<[^>]*>?/gm, "").substring(0, 150)}
+                    {post.content.length > 150 ? "..." : ""}
                   </p>
                 </CardContent>
                 <CardFooter className="flex justify-between">
                   <div className="text-sm text-muted-foreground">
-                    {post.author?.fullName || 'Anonymous'}
+                    {post.author?.fullName || "Anonymous"}
                   </div>
                   <div className="text-sm text-muted-foreground">
-                    {new Date(post.createdAt).toLocaleDateString()}
+                    {new Date(post.createdAt)?.toLocaleDateString()}
                   </div>
                 </CardFooter>
               </Card>
