@@ -1,3 +1,4 @@
+
 import { useEffect, useRef, useState } from "react";
 import { Place } from "@/types";
 import L from "leaflet";
@@ -47,7 +48,8 @@ export default function MapView({
     // Add the PMTiles layer
     const layer = leafletLayer({
       url: `https://api.protomaps.com/tiles/v3/{z}/{x}/{y}.mvt?key=${API_KEY}`,
-      style: {
+      // Pass custom style as a property of styleParams instead of directly in options
+      styleParams: {
         layers: [
           {
             id: "land",

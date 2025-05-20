@@ -27,7 +27,7 @@ export default function BlogPostPage() {
           .select(`
             *,
             places(*),
-            profiles:author_id(full_name, username, avatar_url)
+            author:profiles!blog_posts_author_id_fkey(full_name, username, avatar_url)
           `)
           .eq("id", id)
           .single();
@@ -57,10 +57,10 @@ export default function BlogPostPage() {
             createdAt: new Date(data.places.created_at),
           } : undefined,
           authorId: data.author_id,
-          author: data.profiles ? {
-            fullName: data.profiles.full_name || "Anonymous",
-            username: data.profiles.username || "user",
-            avatarUrl: data.profiles.avatar_url,
+          author: data.author?.length ? {
+            fullName: data.author[0].full_name || "Anonymous",
+            username: data.author[0].username || "user",
+            avatarUrl: data.author[0].avatar_url,
           } : undefined,
           coverImage: data.cover_image,
           createdAt: new Date(data.created_at),

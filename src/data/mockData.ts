@@ -79,54 +79,78 @@ export const mockReviews: Review[] = [
     id: "r1",
     placeId: "1",
     userId: "u1",
-    userName: "Alex Johnson",
     rating: 5,
     comment: "My favorite place to work remotely. Great coffee and atmosphere!",
-    createdAt: new Date("2023-02-10")
+    createdAt: new Date("2023-02-10"),
+    user: {
+      fullName: "Alex Johnson",
+      username: "alex_j",
+      avatarUrl: undefined
+    }
   },
   {
     id: "r2",
     placeId: "1",
     userId: "u2",
-    userName: "Jamie Smith",
     rating: 4,
     comment: "Love their pastries and the staff is super friendly.",
-    createdAt: new Date("2023-03-05")
+    createdAt: new Date("2023-03-05"),
+    user: {
+      fullName: "Jamie Smith",
+      username: "jamie_s",
+      avatarUrl: undefined
+    }
   },
   {
     id: "r3",
     placeId: "2",
     userId: "u3",
-    userName: "Riley Taylor",
     rating: 5,
     comment: "Amazing selection of games and the rates are reasonable.",
-    createdAt: new Date("2023-02-25")
+    createdAt: new Date("2023-02-25"),
+    user: {
+      fullName: "Riley Taylor",
+      username: "riley_t",
+      avatarUrl: undefined
+    }
   },
   {
     id: "r4",
     placeId: "3",
     userId: "u1",
-    userName: "Alex Johnson",
     rating: 5,
     comment: "The view is breathtaking and the seafood is incredibly fresh.",
-    createdAt: new Date("2023-04-12")
+    createdAt: new Date("2023-04-12"),
+    user: {
+      fullName: "Alex Johnson",
+      username: "alex_j",
+      avatarUrl: undefined
+    }
   },
   {
     id: "r5",
     placeId: "4",
     userId: "u4",
-    userName: "Jordan Patel",
     rating: 4,
     comment: "Such a unique concept! Found a rare book I've been looking for.",
-    createdAt: new Date("2023-04-30")
+    createdAt: new Date("2023-04-30"),
+    user: {
+      fullName: "Jordan Patel",
+      username: "jordan_p",
+      avatarUrl: undefined
+    }
   },
   {
     id: "r6",
     placeId: "5",
     userId: "u2",
-    userName: "Jamie Smith",
     rating: 5,
     comment: "Best views of the city! Great for a night out with friends.",
-    createdAt: new Date("2023-06-01")
+    createdAt: new Date("2023-06-01"),
+    user: {
+      fullName: "Jamie Smith",
+      username: "jamie_s",
+      avatarUrl: undefined
+    }
   },
 ];

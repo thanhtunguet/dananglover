@@ -5,7 +5,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Plus, ArrowRight } from "lucide-react";
+import { Plus } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { toast } from "@/hooks/use-toast";
 import { BlogPost } from "@/types";
@@ -23,7 +23,7 @@ export default function BlogListPage() {
           .select(`
             *,
             places(*),
-            profiles:author_id(full_name, username, avatar_url)
+            author:profiles!blog_posts_author_id_fkey(full_name, username, avatar_url)
           `)
           .order("created_at", { ascending: false });
 
@@ -52,10 +52,10 @@ export default function BlogListPage() {
             createdAt: new Date(post.places.created_at),
           } : undefined,
           authorId: post.author_id,
-          author: post.profiles ? {
-            fullName: post.profiles.full_name || "Anonymous",
-            username: post.profiles.username || "user",
-            avatarUrl: post.profiles.avatar_url,
+          author: post.author?.length ? {
+            fullName: post.author[0].full_name || "Anonymous",
+            username: post.author[0].username || "user",
+            avatarUrl: post.author[0].avatar_url,
           } : undefined,
           coverImage: post.cover_image,
           createdAt: new Date(post.created_at),
