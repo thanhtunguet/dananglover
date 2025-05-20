@@ -31,36 +31,41 @@ export default function BlogListPage() {
           throw error;
         }
 
-        return data.map(post => ({
-          id: post.id,
-          title: post.title,
-          content: post.content,
-          placeId: post.place_id,
-          place: post.places ? {
-            id: post.places.id,
-            name: post.places.name,
-            description: post.places.description,
-            coverImage: post.places.cover_image,
-            rating: post.places.rating,
-            priceRange: post.places.price_range,
-            location: {
-              address: post.places.address,
-              lat: post.places.lat,
-              lng: post.places.lng,
-            },
-            createdBy: post.places.created_by,
-            createdAt: new Date(post.places.created_at),
-          } : undefined,
-          authorId: post.author_id,
-          author: post.profiles ? {
-            fullName: post.profiles.full_name || "Anonymous",
-            username: post.profiles.username || "user",
-            avatarUrl: post.profiles.avatar_url,
-          } : undefined,
-          coverImage: post.cover_image,
-          createdAt: new Date(post.created_at),
-          updatedAt: new Date(post.updated_at),
-        })) as BlogPost[];
+        return data.map(post => {
+          // Map the Supabase response to our BlogPost type
+          const blogPost: BlogPost = {
+            id: post.id,
+            title: post.title,
+            content: post.content,
+            placeId: post.place_id,
+            place: post.places ? {
+              id: post.places.id,
+              name: post.places.name,
+              description: post.places.description,
+              coverImage: post.places.cover_image,
+              rating: post.places.rating,
+              priceRange: post.places.price_range,
+              location: {
+                address: post.places.address,
+                lat: post.places.lat,
+                lng: post.places.lng,
+              },
+              createdBy: post.places.created_by,
+              createdAt: new Date(post.places.created_at),
+            } : undefined,
+            authorId: post.author_id,
+            author: post.profiles ? {
+              fullName: post.profiles.full_name || "Anonymous",
+              username: post.profiles.username || "user",
+              avatarUrl: post.profiles.avatar_url,
+            } : undefined,
+            coverImage: post.cover_image,
+            createdAt: new Date(post.created_at),
+            updatedAt: new Date(post.updated_at),
+          };
+          
+          return blogPost;
+        });
       } catch (error) {
         console.error("Error fetching blog posts:", error);
         toast({
