@@ -14,6 +14,10 @@ import ProfilePage from "./pages/ProfilePage";
 import LoginPage from "./pages/LoginPage";
 import NotFound from "./pages/NotFound";
 import { AuthProvider } from "./context/AuthContext";
+import BlogListPage from "./pages/BlogListPage";
+import BlogPostPage from "./pages/BlogPostPage";
+import CreateBlogPostPage from "./pages/CreateBlogPostPage";
+import EditBlogPostPage from "./pages/EditBlogPostPage";
 
 const queryClient = new QueryClient();
 
@@ -33,6 +37,10 @@ const App = () => (
               <Route path="/saved" element={<SavedPlacesPage />} />
               <Route path="/add-place" element={<AddPlacePage />} />
               <Route path="/profile" element={<ProfilePage />} />
+              <Route path="/blog" element={<BlogListPage />} />
+              <Route path="/blog/:id" element={<BlogPostPage />} />
+              <Route path="/blog/new" element={<CreateBlogPostPage />} />
+              <Route path="/blog/edit/:id" element={<EditBlogPostPage />} />
             </Route>
             <Route path="*" element={<NotFound />} />
           </Routes>

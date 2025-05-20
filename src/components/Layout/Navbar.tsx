@@ -45,6 +45,9 @@ export default function Navbar() {
               <Link to="/saved" className="font-medium transition-colors hover:text-foreground/80 text-foreground/60">
                 Saved
               </Link>
+              <Link to="/blog" className="font-medium transition-colors hover:text-foreground/80 text-foreground/60">
+                Blog
+              </Link>
             </div>
             <Link to="/add-place">
               <Button size="sm" variant="default" className="rounded-full">
@@ -92,6 +95,13 @@ export default function Navbar() {
               onClick={() => setIsMenuOpen(false)}
             >
               Saved
+            </Link>
+            <Link 
+              to="/blog" 
+              className="flex w-full items-center rounded-md p-2 hover:bg-accent"
+              onClick={() => setIsMenuOpen(false)}
+            >
+              Blog
             </Link>
             <Link 
               to="/add-place" 

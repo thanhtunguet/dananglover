@@ -28,3 +28,20 @@ export interface Review {
     avatarUrl?: string;
   };
 }
+
+export interface BlogPost {
+  id: string;
+  title: string;
+  content: string;
+  placeId?: string;
+  place?: Place;
+  authorId: string;
+  author?: {
+    fullName: string;
+    username: string;
+    avatarUrl?: string;
+  };
+  coverImage?: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
