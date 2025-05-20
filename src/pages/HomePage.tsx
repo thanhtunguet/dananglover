@@ -1,30 +1,28 @@
-
-import { useState, useEffect } from 'react';
-import { Search } from 'lucide-react';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import PlaceGrid from '@/components/Places/PlaceGrid';
-import { useQuery } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
-import { Place } from '@/types';
-import { useToast } from '@/hooks/use-toast';
+import { useState } from "react";
+import { Search } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import PlaceGrid from "@/components/Places/PlaceGrid";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
+import { Place } from "@/types";
+import { useToast } from "@/hooks/use-toast";
 
 export default function HomePage() {
-  const [searchQuery, setSearchQuery] = useState('');
-  const [filteredPlaces, setFilteredPlaces] = useState<Place[]>([]);
+  const [searchQuery, setSearchQuery] = useState("");
   const { toast } = useToast();
-  
+
   // Fetch all places
   const { data: places = [], isLoading } = useQuery({
-    queryKey: ['places'],
+    queryKey: ["places"],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from('places')
-        .select('*')
-        .order('created_at', { ascending: false });
-        
+        .from("places")
+        .select("*")
+        .order("created_at", { ascending: false });
+
       if (error) {
-        console.error('Error fetching places:', error);
+        console.error("Error fetching places:", error);
         toast({
           variant: "destructive",
           title: "Error loading places",
@@ -32,13 +30,13 @@ export default function HomePage() {
         });
         return [];
       }
-      
+
       // Convert to our Place type
-      return data.map(place => ({
+      return data.map((place) => ({
         id: place.id,
         name: place.name,
         description: place.description,
-        coverImage: place.cover_image,
+        cover_image: place.cover_image,
         rating: place.rating,
         priceRange: place.price_range as 1 | 2 | 3,
         location: {
@@ -51,29 +49,23 @@ export default function HomePage() {
       })) as Place[];
     },
   });
-  
-  // Update filtered places when places change or search query changes
-  useEffect(() => {
-    if (!places) return;
-    
-    if (searchQuery.trim() === '') {
-      setFilteredPlaces(places);
-      return;
-    }
-    
-    const query = searchQuery.toLowerCase();
-    const results = places.filter(place => 
-      place.name.toLowerCase().includes(query) || 
-      place.description.toLowerCase().includes(query) ||
-      place.location.address.toLowerCase().includes(query)
-    );
-    
-    setFilteredPlaces(results);
-  }, [places, searchQuery]);
+
+  // Compute filtered places based on search query
+  const filteredPlaces =
+    searchQuery.trim() === ""
+      ? places
+      : places.filter((place) => {
+          const query = searchQuery.toLowerCase();
+          return (
+            place.name.toLowerCase().includes(query) ||
+            place.description.toLowerCase().includes(query) ||
+            place.location.address.toLowerCase().includes(query)
+          );
+        });
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
-    // The filtering is already handled by the useEffect
+    // The filtering is already handled by the computed filteredPlaces
   };
 
   return (
@@ -85,8 +77,8 @@ export default function HomePage() {
         <p className="max-w-[700px] text-lg text-muted-foreground">
           Find and share your favorite hangout spots with friends
         </p>
-        
-        <form 
+
+        <form
           onSubmit={handleSearch}
           className="flex w-full max-w-lg gap-2 mt-4"
         >
@@ -107,7 +99,9 @@ export default function HomePage() {
       <div className="space-y-8">
         <section>
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-2xl font-bold tracking-tight">Popular Places</h2>
+            <h2 className="text-2xl font-bold tracking-tight">
+              Popular Places
+            </h2>
           </div>
           {isLoading ? (
             <div className="flex items-center justify-center h-40">

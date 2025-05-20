@@ -35,7 +35,7 @@ interface FormValues {
   title: string;
   content: string;
   placeId: string | "none";
-  coverImage: string;
+  cover_image: string;
 }
 
 export default function BlogPostForm({ postId }: BlogPostFormProps) {
@@ -101,7 +101,7 @@ export default function BlogPostForm({ postId }: BlogPostFormProps) {
       title: "",
       content: "",
       placeId: "none",
-      coverImage: "",
+      cover_image: "",
     },
   });
 
@@ -112,7 +112,7 @@ export default function BlogPostForm({ postId }: BlogPostFormProps) {
         title: post.title,
         content: post.content,
         placeId: post.place_id || "none",
-        coverImage: post.cover_image || "",
+        cover_image: post.cover_image || "",
       });
     }
   }, [post, form]);
@@ -132,7 +132,7 @@ export default function BlogPostForm({ postId }: BlogPostFormProps) {
           content: values.content,
           place_id: placeId,
           author_id: user.id,
-          cover_image: values.coverImage || null,
+          cover_image: values.cover_image || null,
           created_at: new Date().toISOString(),
           updated_at: new Date().toISOString(),
         })
@@ -173,7 +173,7 @@ export default function BlogPostForm({ postId }: BlogPostFormProps) {
             id: completePost.places.id,
             name: completePost.places.name,
             description: completePost.places.description,
-            coverImage: completePost.places.cover_image,
+            cover_image: completePost.places.cover_image,
             rating: completePost.places.rating,
             priceRange: completePost.places.price_range,
             location: {
@@ -193,7 +193,7 @@ export default function BlogPostForm({ postId }: BlogPostFormProps) {
             avatarUrl: completePost.profiles.avatar_url,
           }
           : undefined,
-        coverImage: completePost.cover_image,
+        cover_image: completePost.cover_image,
         createdAt: new Date(completePost.created_at),
         updatedAt: new Date(completePost.updated_at),
       };
@@ -234,7 +234,7 @@ export default function BlogPostForm({ postId }: BlogPostFormProps) {
           title: values.title,
           content: values.content,
           place_id: placeId,
-          cover_image: values.coverImage || null,
+          cover_image: values.cover_image || null,
           updated_at: new Date().toISOString(),
         })
         .eq("id", postId);
@@ -267,7 +267,7 @@ export default function BlogPostForm({ postId }: BlogPostFormProps) {
             id: completePost.places.id,
             name: completePost.places.name,
             description: completePost.places.description,
-            coverImage: completePost.places.cover_image,
+            cover_image: completePost.places.cover_image,
             rating: completePost.places.rating,
             priceRange: completePost.places.price_range,
             location: {
@@ -281,7 +281,7 @@ export default function BlogPostForm({ postId }: BlogPostFormProps) {
           : undefined,
         authorId: completePost.author_id,
         author: completePost.profiles ? completePost.profiles : undefined,
-        coverImage: completePost.cover_image,
+        cover_image: completePost.cover_image,
         createdAt: new Date(completePost.created_at),
         updatedAt: new Date(completePost.updated_at),
       };
@@ -394,7 +394,7 @@ export default function BlogPostForm({ postId }: BlogPostFormProps) {
 
         <FormField
           control={form.control}
-          name="coverImage"
+          name="cover_image"
           render={({ field }) => (
             <FormItem>
               <FormLabel>Cover Image URL (Optional)</FormLabel>

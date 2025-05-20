@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Link, Navigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -14,47 +13,50 @@ import { useToast } from "@/hooks/use-toast";
 export default function ProfilePage() {
   const { user, session, signOut, loading } = useAuth();
   const { toast } = useToast();
-  const [profile, setProfile] = useState<{ full_name: string | null; avatar_url: string | null } | null>(null);
+  const [profile, setProfile] = useState<{
+    full_name: string | null;
+    avatar_url: string | null;
+  } | null>(null);
 
   // Fetch user profile data
   useEffect(() => {
     async function fetchProfile() {
       if (!user) return;
-      
+
       try {
         const { data, error } = await supabase
-          .from('profiles')
-          .select('full_name, avatar_url')
-          .eq('id', user.id)
+          .from("profiles")
+          .select("full_name, avatar_url")
+          .eq("id", user.id)
           .single();
-          
+
         if (error) {
-          console.error('Error fetching profile:', error);
+          console.error("Error fetching profile:", error);
           return;
         }
-        
+
         setProfile(data);
       } catch (error) {
-        console.error('Error:', error);
+        console.error("Error:", error);
       }
     }
-    
+
     fetchProfile();
   }, [user]);
 
   // Fetch places created by the user
   const { data: userPlaces = [], isLoading: placesLoading } = useQuery({
-    queryKey: ['userPlaces', user?.id],
+    queryKey: ["userPlaces", user?.id],
     queryFn: async () => {
       if (!user) return [];
-      
+
       const { data, error } = await supabase
-        .from('places')
-        .select('*')
-        .eq('created_by', user.id);
-        
+        .from("places")
+        .select("*")
+        .eq("created_by", user.id);
+
       if (error) {
-        console.error('Error fetching places:', error);
+        console.error("Error fetching places:", error);
         toast({
           variant: "destructive",
           title: "Error loading places",
@@ -62,13 +64,13 @@ export default function ProfilePage() {
         });
         return [];
       }
-      
+
       // Convert Supabase data to our Place type
-      return data.map(place => ({
+      return data.map((place) => ({
         id: place.id,
         name: place.name,
         description: place.description,
-        coverImage: place.cover_image,
+        cover_image: place.cover_image,
         rating: place.rating,
         priceRange: place.price_range as 1 | 2 | 3,
         location: {
@@ -82,12 +84,12 @@ export default function ProfilePage() {
     },
     enabled: !!user,
   });
-  
+
   const handleLogout = async () => {
     try {
       await signOut();
     } catch (error) {
-      console.error('Error signing out:', error);
+      console.error("Error signing out:", error);
       toast({
         variant: "destructive",
         title: "Error signing out",
@@ -124,7 +126,9 @@ export default function ProfilePage() {
           )}
         </div>
         <div className="space-y-1">
-          <h1 className="text-2xl font-bold">{profile?.full_name || user?.email?.split('@')[0]}</h1>
+          <h1 className="text-2xl font-bold">
+            {profile?.full_name || user?.email?.split("@")[0]}
+          </h1>
           <p className="text-muted-foreground">{user?.email}</p>
         </div>
         <div className="flex gap-2">
@@ -140,7 +144,7 @@ export default function ProfilePage() {
           <TabsTrigger value="myPlaces">My Places</TabsTrigger>
           <TabsTrigger value="settings">Settings</TabsTrigger>
         </TabsList>
-        
+
         <TabsContent value="myPlaces" className="mt-6">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-xl font-semibold">Places you've added</h2>
@@ -151,19 +155,19 @@ export default function ProfilePage() {
               </Link>
             </Button>
           </div>
-          
+
           {placesLoading ? (
             <div className="flex items-center justify-center h-40">
               <p>Loading your places...</p>
             </div>
           ) : (
-            <PlaceGrid 
-              places={userPlaces} 
-              emptyMessage="You haven't added any places yet." 
+            <PlaceGrid
+              places={userPlaces}
+              emptyMessage="You haven't added any places yet."
             />
           )}
         </TabsContent>
-        
+
         <TabsContent value="settings" className="mt-6">
           <div className="max-w-md mx-auto space-y-6">
             <div className="space-y-2">
@@ -172,7 +176,7 @@ export default function ProfilePage() {
                 Manage your account settings and preferences.
               </p>
             </div>
-            
+
             <div className="space-y-2 border-t pt-4">
               <h4 className="font-medium">Email Notifications</h4>
               <p className="text-sm text-muted-foreground">
@@ -189,7 +193,7 @@ export default function ProfilePage() {
                 </div>
               </div>
             </div>
-            
+
             <div className="space-y-2 border-t pt-4">
               <h4 className="font-medium text-destructive">Danger Zone</h4>
               <p className="text-sm text-muted-foreground">
