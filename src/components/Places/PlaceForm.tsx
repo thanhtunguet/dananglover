@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -17,7 +18,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import StarRating from "@/components/Forms/StarRating";
-import PriceRangeSelector from "@/components/Forms/PriceRangeSelector";
+import PriceInput from "@/components/Forms/PriceInput";
 import { useAuth } from "@/context/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -28,7 +29,7 @@ const formSchema = z.object({
   description: z.string().min(10, "Description must be at least 10 characters"),
   cover_image: z.string().url("Must be a valid URL"),
   rating: z.number().min(1).max(5),
-  priceRange: z.number().min(1).max(3),
+  price: z.number().min(0, "Price cannot be negative"),
   address: z.string().min(5, "Address must be at least 5 characters"),
 });
 
@@ -51,7 +52,7 @@ export function PlaceForm({ place }: PlaceFormProps) {
       description: place?.description || "",
       cover_image: place?.cover_image || "",
       rating: place?.rating || 0,
-      priceRange: place?.price_range || 1,
+      price: place?.price || 0,
       address: place?.location.address || "",
     },
   });
@@ -82,7 +83,7 @@ export function PlaceForm({ place }: PlaceFormProps) {
             description: values.description,
             cover_image: values.cover_image,
             rating: values.rating,
-            price_range: values.priceRange,
+            price_range: values.price, // Field name remains price_range in DB
             address: values.address,
             lat: mockLat,
             lng: mockLng,
@@ -106,7 +107,7 @@ export function PlaceForm({ place }: PlaceFormProps) {
               description: values.description,
               cover_image: values.cover_image,
               rating: values.rating,
-              price_range: values.priceRange,
+              price_range: values.price, // Field name remains price_range in DB
               address: values.address,
               lat: mockLat,
               lng: mockLng,
@@ -130,7 +131,7 @@ export function PlaceForm({ place }: PlaceFormProps) {
 
       // For updates, navigate back to the place detail page
       navigate(`/places/${place.id}`);
-    } catch (error: Error) {
+    } catch (error: any) {
       console.error("Error managing place:", error);
       toast({
         variant: "destructive",
@@ -230,19 +231,16 @@ export function PlaceForm({ place }: PlaceFormProps) {
 
           <FormField
             control={form.control}
-            name="priceRange"
+            name="price"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Price Range</FormLabel>
+                <FormLabel>Price (VND)</FormLabel>
                 <FormControl>
-                  <PriceRangeSelector
+                  <PriceInput
                     value={field.value}
                     onChange={field.onChange}
                   />
                 </FormControl>
-                <FormDescription>
-                  Select the price range ($ to $$$)
-                </FormDescription>
                 <FormMessage />
               </FormItem>
             )}

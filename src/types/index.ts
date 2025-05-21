@@ -1,3 +1,4 @@
+
 export interface Place {
   id: string;
   name: string;
@@ -7,7 +8,7 @@ export interface Place {
   lng?: number;
   cover_image: string;
   rating: number;
-  price_range: 1 | 2 | 3; // 1=$, 2=$$, 3=$$$
+  price: number; // Changed from price_range to price
   location: {
     address: string;
     lat: number;

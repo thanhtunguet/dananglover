@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
@@ -38,13 +39,13 @@ export default function HomePage() {
         description: place.description,
         cover_image: place.cover_image,
         rating: place.rating,
-        priceRange: place.price_range as 1 | 2 | 3,
+        price: place.price_range, // Map from DB price_range to our price field
         location: {
           address: place.address,
           lat: place.lat,
           lng: place.lng,
         },
-        createdBy: place.created_by,
+        created_by: place.created_by,
         created_at: new Date(place.created_at),
       })) as Place[];
     },

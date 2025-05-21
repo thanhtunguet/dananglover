@@ -1,5 +1,6 @@
+
 import { Link } from "react-router-dom";
-import { Star, MapPin, DollarSign } from "lucide-react";
+import { Star, MapPin } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Place } from "@/types";
 
@@ -9,6 +10,17 @@ interface PlaceCardProps {
 }
 
 export default function PlaceCard({ place, className }: PlaceCardProps) {
+  // Format price in Vietnamese Dong
+  const formatPrice = (price: number) => {
+    return new Intl.NumberFormat('vi-VN', {
+      style: 'currency',
+      currency: 'VND',
+      // Use 0 decimal places to remove decimals from VND format
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0
+    }).format(price);
+  };
+
   return (
     <Link
       to={`/places/${place.id}`}
@@ -43,16 +55,9 @@ export default function PlaceCard({ place, className }: PlaceCardProps) {
           <p className="text-sm text-muted-foreground line-clamp-1">
             {place.description}
           </p>
-          <div className="flex">
-            {Array(place.price_range)
-              .fill(0)
-              .map((_, i) => (
-                <DollarSign
-                  key={i}
-                  className="h-3.5 w-3.5 text-muted-foreground"
-                />
-              ))}
-          </div>
+          <span className="text-sm font-medium">
+            {formatPrice(place.price)}
+          </span>
         </div>
       </div>
     </Link>
