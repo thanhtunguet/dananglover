@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
@@ -39,7 +38,7 @@ export default function HomePage() {
         description: place.description,
         cover_image: place.cover_image,
         rating: place.rating,
-        price: place.price_range, // Map from DB price_range to our price field
+        price_range: place.price_range, // Matches DB field name
         location: {
           address: place.address,
           lat: place.lat,

@@ -29,7 +29,7 @@ export default function BlogListPage() {
             `
             *,
             places(*),
-            profiles(full_name, username, avatar_url)
+            profiles(full_name, username, avatar_url, id)
           `
           )
           .order("created_at", { ascending: false });
@@ -63,8 +63,9 @@ export default function BlogListPage() {
                 }
               : undefined,
             author_id: post.author_id,
-            author: post.profiles
+            profiles: post.profiles
               ? {
+                  id: post.profiles.id,
                   full_name: post.profiles.full_name || "Anonymous",
                   username: post.profiles.username || "user",
                   avatar_url: post.profiles.avatar_url,
@@ -145,10 +146,10 @@ export default function BlogListPage() {
                 </CardContent>
                 <CardFooter className="flex justify-between">
                   <div className="text-sm text-muted-foreground">
-                    {post.author?.full_name || "Anonymous"}
+                    {post.profiles?.full_name || "Anonymous"}
                   </div>
                   <div className="text-sm text-muted-foreground">
-                    {new Date(post.created_at)?.toLocaleDateString()}
+                    {new Date(post.created_at).toLocaleDateString()}
                   </div>
                 </CardFooter>
               </Card>

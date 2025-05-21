@@ -26,7 +26,7 @@ export default function BlogPostPage() {
           data,
           error,
         }: {
-          data: BlogPost;
+          data: any;
           error: Error;
         } = await supabase
           .from("blog_posts")
@@ -34,7 +34,7 @@ export default function BlogPostPage() {
             `
             *,
             places(*),
-            profiles(full_name, username, avatar_url)
+            profiles(full_name, username, avatar_url, id)
           `
           )
           .eq("id", id)

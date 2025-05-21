@@ -52,7 +52,7 @@ export default function PlaceDetailPage() {
         description: data.description,
         cover_image: data.cover_image,
         rating: data.rating,
-        price_range: data.price_range as 1 | 2 | 3,
+        price_range: data.price_range, // Matches DB field name
         location: {
           address: data.address,
           lat: data.lat,
@@ -101,6 +101,7 @@ export default function PlaceDetailPage() {
               created_at: new Date(review.created_at),
               user: profileData
                 ? {
+                    id: profileData.id,
                     full_name: profileData.full_name || "Anonymous",
                     username: profileData.username || "user",
                     avatar_url: profileData.avatar_url,

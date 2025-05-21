@@ -1,4 +1,3 @@
-
 import { useNavigate } from "react-router-dom";
 import MapView from "@/components/Map/MapView";
 import { useQuery } from "@tanstack/react-query";
@@ -33,7 +32,7 @@ export default function MapPage() {
         description: place.description,
         cover_image: place.cover_image,
         rating: place.rating,
-        price: place.price_range, // Map from DB price_range to our price field
+        price_range: place.price_range, // Matches DB field name
         location: {
           address: place.address,
           lat: place.lat,

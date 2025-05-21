@@ -29,7 +29,7 @@ const formSchema = z.object({
   description: z.string().min(10, "Description must be at least 10 characters"),
   cover_image: z.string().url("Must be a valid URL"),
   rating: z.number().min(1).max(5),
-  price: z.number().min(0, "Price cannot be negative"),
+  price_range: z.number().min(0, "Price cannot be negative"),
   address: z.string().min(5, "Address must be at least 5 characters"),
 });
 
@@ -52,7 +52,7 @@ export function PlaceForm({ place }: PlaceFormProps) {
       description: place?.description || "",
       cover_image: place?.cover_image || "",
       rating: place?.rating || 0,
-      price: place?.price || 0,
+      price_range: place?.price_range || 0,
       address: place?.location.address || "",
     },
   });
@@ -83,7 +83,7 @@ export function PlaceForm({ place }: PlaceFormProps) {
             description: values.description,
             cover_image: values.cover_image,
             rating: values.rating,
-            price_range: values.price, // Field name remains price_range in DB
+            price_range: values.price_range, // Now matches DB field name
             address: values.address,
             lat: mockLat,
             lng: mockLng,
@@ -107,7 +107,7 @@ export function PlaceForm({ place }: PlaceFormProps) {
               description: values.description,
               cover_image: values.cover_image,
               rating: values.rating,
-              price_range: values.price, // Field name remains price_range in DB
+              price_range: values.price_range, // Now matches DB field name
               address: values.address,
               lat: mockLat,
               lng: mockLng,

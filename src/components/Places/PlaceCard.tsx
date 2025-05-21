@@ -56,7 +56,7 @@ export default function PlaceCard({ place, className }: PlaceCardProps) {
             {place.description}
           </p>
           <span className="text-sm font-medium">
-            {formatPrice(place.price)}
+            {formatPrice(place.price_range)}
           </span>
         </div>
       </div>

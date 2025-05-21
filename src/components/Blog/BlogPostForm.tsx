@@ -146,7 +146,7 @@ export default function BlogPostForm({ postId }: BlogPostFormProps) {
         data: completePost,
         error: fetchError,
       }: {
-        data: BlogPost;
+        data: any;
         error: Error;
       } = await supabase
         .from("blog_posts")
@@ -154,7 +154,7 @@ export default function BlogPostForm({ postId }: BlogPostFormProps) {
           `
           *,
           places(*),
-          profiles(full_name, username, avatar_url)
+          profiles(full_name, username, avatar_url, id)
         `
         )
         .eq("id", newPost.id)
@@ -168,26 +168,27 @@ export default function BlogPostForm({ postId }: BlogPostFormProps) {
         title: completePost.title,
         content: completePost.content,
         place_id: completePost.place_id,
-        place: completePost.places
+        places: completePost.places
           ? {
               id: completePost.places.id,
               name: completePost.places.name,
               description: completePost.places.description,
               cover_image: completePost.places.cover_image,
               rating: completePost.places.rating,
-              priceRange: completePost.places.price_range,
+              price_range: completePost.places.price_range,
               location: {
                 address: completePost.places.address,
                 lat: completePost.places.lat,
                 lng: completePost.places.lng,
               },
-              createdBy: completePost.places.created_by,
+              created_by: completePost.places.created_by,
               created_at: new Date(completePost.places.created_at),
             }
           : undefined,
-        authorId: completePost.author_id,
-        author: completePost.profiles
+        author_id: completePost.author_id,
+        profiles: completePost.profiles
           ? {
+              id: completePost.profiles.id,
               full_name: completePost.profiles.full_name || "Anonymous",
               username: completePost.profiles.username || "user",
               avatar_url: completePost.profiles.avatar_url,
@@ -248,7 +249,7 @@ export default function BlogPostForm({ postId }: BlogPostFormProps) {
           `
           *,
           places(*),
-          profiles(full_name, username, avatar_url)
+          profiles(full_name, username, avatar_url, id)
         `
         )
         .eq("id", postId)
@@ -262,25 +263,32 @@ export default function BlogPostForm({ postId }: BlogPostFormProps) {
         title: completePost.title,
         content: completePost.content,
         place_id: completePost.place_id,
-        place: completePost.places
+        places: completePost.places
           ? {
               id: completePost.places.id,
               name: completePost.places.name,
               description: completePost.places.description,
               cover_image: completePost.places.cover_image,
               rating: completePost.places.rating,
-              priceRange: completePost.places.price_range,
+              price_range: completePost.places.price_range,
               location: {
                 address: completePost.places.address,
                 lat: completePost.places.lat,
                 lng: completePost.places.lng,
               },
-              createdBy: completePost.places.created_by,
+              created_by: completePost.places.created_by,
               created_at: new Date(completePost.places.created_at),
             }
           : undefined,
-        authorId: completePost.author_id,
-        author: completePost.profiles ? completePost.profiles : undefined,
+        author_id: completePost.author_id,
+        profiles: completePost.profiles
+          ? {
+              id: completePost.profiles.id,
+              full_name: completePost.profiles.full_name || "Anonymous",
+              username: completePost.profiles.username || "user",
+              avatar_url: completePost.profiles.avatar_url,
+            }
+          : undefined,
         cover_image: completePost.cover_image,
         created_at: new Date(completePost.created_at),
         updated_at: new Date(completePost.updated_at),

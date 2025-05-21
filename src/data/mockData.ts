@@ -1,3 +1,4 @@
+
 import { Place, Review } from "@/types";
 
 export const mockPlaces: Place[] = [
@@ -92,6 +93,7 @@ export const mockReviews: Review[] = [
     comment: "My favorite place to work remotely. Great coffee and atmosphere!",
     created_at: new Date("2023-02-10"),
     user: {
+      id: "u1",
       full_name: "Alex Johnson",
       username: "alex_j",
       avatar_url: undefined,
@@ -105,6 +107,7 @@ export const mockReviews: Review[] = [
     comment: "Love their pastries and the staff is super friendly.",
     created_at: new Date("2023-03-05"),
     user: {
+      id: "u2",
       full_name: "Jamie Smith",
       username: "jamie_s",
       avatar_url: undefined,
@@ -118,6 +121,7 @@ export const mockReviews: Review[] = [
     comment: "Amazing selection of games and the rates are reasonable.",
     created_at: new Date("2023-02-25"),
     user: {
+      id: "u3",
       full_name: "Riley Taylor",
       username: "riley_t",
       avatar_url: undefined,
@@ -131,6 +135,7 @@ export const mockReviews: Review[] = [
     comment: "The view is breathtaking and the seafood is incredibly fresh.",
     created_at: new Date("2023-04-12"),
     user: {
+      id: "u1",
       full_name: "Alex Johnson",
       username: "alex_j",
       avatar_url: undefined,
@@ -144,6 +149,7 @@ export const mockReviews: Review[] = [
     comment: "Such a unique concept! Found a rare book I've been looking for.",
     created_at: new Date("2023-04-30"),
     user: {
+      id: "u4",
       full_name: "Jordan Patel",
       username: "jordan_p",
       avatar_url: undefined,
@@ -157,6 +163,7 @@ export const mockReviews: Review[] = [
     comment: "Best views of the city! Great for a night out with friends.",
     created_at: new Date("2023-06-01"),
     user: {
+      id: "u2",
       full_name: "Jamie Smith",
       username: "jamie_s",
       avatar_url: undefined,

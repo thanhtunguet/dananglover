@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { Navigate } from "react-router-dom";
 import PlaceGrid from "@/components/Places/PlaceGrid";
 import { useAuth } from "@/context/AuthContext";
@@ -64,13 +63,13 @@ export default function SavedPlacesPage() {
         description: place.description,
         cover_image: place.cover_image,
         rating: place.rating,
-        priceRange: place.price_range as 1 | 2 | 3,
+        price_range: place.price_range, // Matches DB field name
         location: {
           address: place.address,
           lat: place.lat,
           lng: place.lng,
         },
-        createdBy: place.created_by,
+        created_by: place.created_by,
         created_at: new Date(place.created_at),
       })) as Place[];
     },

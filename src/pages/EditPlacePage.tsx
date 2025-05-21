@@ -1,4 +1,3 @@
-
 import { useParams, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect } from "react";
@@ -41,7 +40,7 @@ export default function EditPlacePage() {
         description: data.description,
         cover_image: data.cover_image,
         rating: data.rating,
-        price: data.price_range, // Map from DB price_range to our price field
+        price_range: data.price_range, // Matches DB field name
         location: {
           address: data.address,
           lat: data.lat,
