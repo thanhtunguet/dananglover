@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Link, Navigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -72,13 +73,13 @@ export default function ProfilePage() {
         description: place.description,
         cover_image: place.cover_image,
         rating: place.rating,
-        priceRange: place.price_range as 1 | 2 | 3,
+        price_range: place.price_range,
         location: {
           address: place.address,
           lat: place.lat,
           lng: place.lng,
         },
-        createdBy: place.created_by,
+        created_by: place.created_by,
         created_at: new Date(place.created_at),
       })) as Place[];
     },

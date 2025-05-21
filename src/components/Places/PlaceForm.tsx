@@ -83,7 +83,7 @@ export function PlaceForm({ place }: PlaceFormProps) {
             description: values.description,
             cover_image: values.cover_image,
             rating: values.rating,
-            price_range: values.price_range, // Now matches DB field name
+            price_range: values.price_range,
             address: values.address,
             lat: mockLat,
             lng: mockLng,
@@ -107,7 +107,7 @@ export function PlaceForm({ place }: PlaceFormProps) {
               description: values.description,
               cover_image: values.cover_image,
               rating: values.rating,
-              price_range: values.price_range, // Now matches DB field name
+              price_range: values.price_range,
               address: values.address,
               lat: mockLat,
               lng: mockLng,
@@ -231,7 +231,7 @@ export function PlaceForm({ place }: PlaceFormProps) {
 
           <FormField
             control={form.control}
-            name="price"
+            name="price_range"
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Price (VND)</FormLabel>
