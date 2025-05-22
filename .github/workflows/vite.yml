@@ -34,7 +34,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          bun install
+          npm install
 
       - name: Build
         run: |
