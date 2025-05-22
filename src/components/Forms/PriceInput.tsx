@@ -25,7 +25,7 @@ export default function PriceInput({
         <Input
           type="number"
           min={0}
-          step={1000}
+          step={10000}
           value={value}
           onChange={handleInputChange}
           disabled={disabled}

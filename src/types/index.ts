@@ -8,7 +8,7 @@ export interface Place {
   lng?: number;
   cover_image: string;
   rating: number;
-  price_range: number; // Changed from price to price_range to match DB
+  price_range: number; // Now using integer type for larger values
   location: {
     address: string;
     lat: number;
