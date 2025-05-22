@@ -19,6 +19,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import StarRating from "@/components/Forms/StarRating";
 import PriceInput from "@/components/Forms/PriceInput";
+import ImageUpload from "@/components/Forms/ImageUpload";
 import { useAuth } from "@/context/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -27,7 +28,7 @@ import { Place } from "@/types";
 const formSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
   description: z.string().min(10, "Description must be at least 10 characters"),
-  cover_image: z.string().url("Must be a valid URL"),
+  cover_image: z.string().min(1, "Cover image is required"),
   rating: z.number().min(1).max(5),
   price_range: z.number().min(0, "Price cannot be negative"),
   address: z.string().min(5, "Address must be at least 5 characters"),
@@ -197,16 +198,14 @@ export function PlaceForm({ place }: PlaceFormProps) {
             name="cover_image"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Cover Image URL</FormLabel>
+                <FormLabel>Cover Image</FormLabel>
                 <FormControl>
-                  <Input
-                    placeholder="https://example.com/image.jpg"
-                    {...field}
+                  <ImageUpload
+                    value={field.value}
+                    onChange={field.onChange}
+                    label="Cover Image"
                   />
                 </FormControl>
-                <FormDescription>
-                  URL of the cover image for the place
-                </FormDescription>
                 <FormMessage />
               </FormItem>
             )}
