@@ -21,11 +21,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup Node
-        uses: actions/setup-node@v4
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v1
         with:
-          node-version: "20"
-          cache: "npm"
+          bun-version: latest
 
       - name: Create .env file
         env:
@@ -33,12 +32,11 @@ jobs:
         run: echo "VITE_PROTOMAPS_API_KEY=${VITE_PROTOMAPS_API_KEY}" > .env
 
       - name: Install dependencies
-        run: |
-          npm install
+        run: bun install
 
       - name: Build
         run: |
-          npm run build
+          bun run build
           cp dist/index.html dist/404.html
 
       - name: Setup Pages
