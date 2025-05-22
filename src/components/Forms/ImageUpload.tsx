@@ -57,16 +57,14 @@ export default function ImageUpload({ value, onChange, label = "Image" }: ImageU
         .upload(filePath, file, {
           cacheControl: '3600',
           upsert: false,
-          onUploadProgress: (progress) => {
-            if (progress.totalBytes) {
-              setUploadProgress(Math.round((progress.bytesUploaded / progress.totalBytes) * 100));
-            }
-          },
         });
 
       if (uploadError) {
         throw uploadError;
       }
+
+      // Manual tracking of progress (since we removed the callback)
+      setUploadProgress(100);
 
       // Get public URL
       const {
