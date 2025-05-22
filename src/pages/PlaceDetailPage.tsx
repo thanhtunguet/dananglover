@@ -1,8 +1,9 @@
 import { useState, useEffect, useRef } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
-import { Heart, Star, MapPin, ArrowLeft, Edit, Trash2 } from "lucide-react";
+import { Heart, Star, MapPin, ArrowLeft, Edit, Trash2, MessageSquarePlus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import ReviewList from "@/components/Reviews/ReviewList";
+import ReviewForm from "@/components/Reviews/ReviewForm";
 import { useAuth } from "@/context/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -22,6 +23,7 @@ export default function PlaceDetailPage() {
   const navigate = useNavigate();
   const [isSaved, setIsSaved] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [isWritingReview, setIsWritingReview] = useState(false);
 
   // Fetch place details
   const { data: place, isLoading: placeLoading } = useQuery({
@@ -247,6 +249,18 @@ export default function PlaceDetailPage() {
     }
   };
 
+  const handleStartReview = () => {
+    if (!user) {
+      toast({
+        title: "Login required",
+        description: "Please log in to write a review.",
+        variant: "destructive",
+      });
+      return;
+    }
+    setIsWritingReview(true);
+  };
+
   if (placeLoading) {
     return (
       <div className="container py-8 flex items-center justify-center">
@@ -354,7 +368,30 @@ export default function PlaceDetailPage() {
           </div>
 
           <div className="mt-8">
-            <h2 className="text-xl font-semibold mb-4">Reviews</h2>
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-xl font-semibold">Reviews</h2>
+              {!isWritingReview && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleStartReview}
+                  className="flex items-center gap-2"
+                >
+                  <MessageSquarePlus className="h-4 w-4" />
+                  Write a Review
+                </Button>
+              )}
+            </div>
+
+            {isWritingReview ? (
+              <div className="mb-8 p-6 border rounded-lg bg-card">
+                <ReviewForm
+                  placeId={id || ""}
+                  onSuccess={() => setIsWritingReview(false)}
+                />
+              </div>
+            ) : null}
+
             <ReviewList
               reviews={reviews}
               isLoading={reviewsLoading}
