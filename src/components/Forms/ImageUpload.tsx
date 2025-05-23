@@ -121,7 +121,7 @@ export default function ImageUpload({ value, onChange, label = "Image" }: ImageU
           />
         </div>
       ) : (
-        <div className="flex flex-col items-center justify-center rounded-md border border-dashed p-8 bg-muted/50">
+        <div className="relative flex flex-col items-center justify-center rounded-md border border-dashed p-8 bg-muted/50">
           {isUploading ? (
             <div className="flex flex-col items-center space-y-2">
               <Loader2 className="h-8 w-8 animate-spin text-primary" />
@@ -140,12 +140,17 @@ export default function ImageUpload({ value, onChange, label = "Image" }: ImageU
                   (Max file size: 5MB)
                 </span>
               </div>
-              <input
-                type="file"
-                accept="image/*"
-                onChange={handleFileChange}
-                className="absolute inset-0 cursor-pointer opacity-0"
-              />
+              <label className="mt-4 cursor-pointer">
+                <span className="rounded bg-primary px-3 py-1.5 text-xs font-medium text-primary-foreground">
+                  Browse files
+                </span>
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleFileChange}
+                  className="sr-only"
+                />
+              </label>
             </>
           )}
         </div>
