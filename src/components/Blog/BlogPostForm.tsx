@@ -26,6 +26,7 @@ import { useNavigate } from "react-router-dom";
 import MDEditor from "@uiw/react-md-editor";
 import { cn } from "@/lib/utils";
 import type { BlogPost, Place } from "@/types";
+import ImageUpload from "@/components/Forms/ImageUpload";
 
 interface BlogPostFormProps {
   postId?: string;
@@ -405,12 +406,16 @@ export default function BlogPostForm({ postId }: BlogPostFormProps) {
           name="cover_image"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Cover Image URL (Optional)</FormLabel>
+              <FormLabel>Cover Image</FormLabel>
               <FormControl>
-                <Input placeholder="https://example.com/image.jpg" {...field} />
+                <ImageUpload
+                  value={field.value}
+                  onChange={field.onChange}
+                  label="Cover Image"
+                />
               </FormControl>
               <FormDescription>
-                Provide a URL to an image for your post cover.
+                Upload an image or provide a URL for your post cover.
               </FormDescription>
               <FormMessage />
             </FormItem>
