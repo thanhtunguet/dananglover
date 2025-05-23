@@ -14,10 +14,10 @@ export default function Navbar() {
         <div className="mr-4 hidden md:flex">
           <Link to="/" className="flex items-center space-x-2">
             <MapPin className="h-6 w-6 text-primary" />
-            <span className="font-bold text-xl">Hangout</span>
+            <span className="font-bold text-xl">DaNangLover</span>
           </Link>
         </div>
-        
+
         <div className="flex md:hidden">
           <Button
             variant="ghost"
@@ -29,10 +29,10 @@ export default function Navbar() {
           </Button>
           <Link to="/" className="flex items-center">
             <MapPin className="h-6 w-6 text-primary" />
-            <span className="font-bold text-xl">Hangout</span>
+            <span className="font-bold text-xl">DaNangLover</span>
           </Link>
         </div>
-        
+
         <div className="flex flex-1 items-center justify-end space-x-2">
           <nav className="flex items-center space-x-2">
             <div className="hidden md:flex md:items-center md:gap-5 md:text-sm">
@@ -63,7 +63,7 @@ export default function Navbar() {
           </nav>
         </div>
       </div>
-      
+
       {/* Mobile menu */}
       <div className={cn(
         "fixed inset-0 top-16 z-50 grid h-[calc(100vh-4rem)] grid-flow-row auto-rows-max overflow-auto p-6 pb-32 shadow-md animate-in md:hidden bg-background",
@@ -72,46 +72,46 @@ export default function Navbar() {
         <div className="relative z-20 grid gap-6 p-4">
           <Link to="/" className="flex items-center space-x-2" onClick={() => setIsMenuOpen(false)}>
             <MapPin className="h-6 w-6 text-primary" />
-            <span className="font-bold text-xl">Hangout</span>
+            <span className="font-bold text-xl">DaNangLover</span>
           </Link>
           <nav className="grid grid-flow-row auto-rows-max text-lg">
-            <Link 
-              to="/" 
+            <Link
+              to="/"
               className="flex w-full items-center rounded-md p-2 hover:bg-accent"
               onClick={() => setIsMenuOpen(false)}
             >
               Discover
             </Link>
-            <Link 
-              to="/map" 
+            <Link
+              to="/map"
               className="flex w-full items-center rounded-md p-2 hover:bg-accent"
               onClick={() => setIsMenuOpen(false)}
             >
               Map
             </Link>
-            <Link 
-              to="/saved" 
+            <Link
+              to="/saved"
               className="flex w-full items-center rounded-md p-2 hover:bg-accent"
               onClick={() => setIsMenuOpen(false)}
             >
               Saved
             </Link>
-            <Link 
-              to="/blog" 
+            <Link
+              to="/blog"
               className="flex w-full items-center rounded-md p-2 hover:bg-accent"
               onClick={() => setIsMenuOpen(false)}
             >
               Blog
             </Link>
-            <Link 
-              to="/add-place" 
+            <Link
+              to="/add-place"
               className="flex w-full items-center rounded-md p-2 hover:bg-accent"
               onClick={() => setIsMenuOpen(false)}
             >
               Add Place
             </Link>
-            <Link 
-              to="/profile" 
+            <Link
+              to="/profile"
               className="flex w-full items-center rounded-md p-2 hover:bg-accent"
               onClick={() => setIsMenuOpen(false)}
             >

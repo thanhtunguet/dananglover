@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -29,9 +28,19 @@ const formSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
   description: z.string().min(10, "Description must be at least 10 characters"),
   cover_image: z.string().min(1, "Cover image is required"),
-  rating: z.number().min(1).max(5),
   price_range: z.number().min(0, "Price cannot be negative"),
-  address: z.string().min(5, "Address must be at least 5 characters"),
+  rating: z.number().min(1).max(5).optional().nullable(),
+  address: z.string().min(5, "Address must be at least 5 characters").optional().nullable(),
+  lat: z.number()
+    .min(-90, "Latitude must be between -90 and 90")
+    .max(90, "Latitude must be between -90 and 90")
+    .optional()
+    .nullable(),
+  lng: z.number()
+    .min(-180, "Longitude must be between -180 and 180")
+    .max(180, "Longitude must be between -180 and 180")
+    .optional()
+    .nullable(),
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -52,9 +61,11 @@ export function PlaceForm({ place }: PlaceFormProps) {
       name: place?.name || "",
       description: place?.description || "",
       cover_image: place?.cover_image || "",
-      rating: place?.rating || 0,
       price_range: place?.price_range || 0,
-      address: place?.location.address || "",
+      rating: place?.rating || null,
+      address: place?.location.address || null,
+      lat: place?.location.lat || null,
+      lng: place?.location.lng || null,
     },
   });
 
@@ -71,26 +82,24 @@ export function PlaceForm({ place }: PlaceFormProps) {
     setIsSubmitting(true);
 
     try {
-      // Use a geocoding API for production. For now, we'll use mock coordinates
-      const mockLat = place?.location.lat || 40.7128 + Math.random() * 0.1;
-      const mockLng = place?.location.lng || -74.006 + Math.random() * 0.1;
+      const placeData = {
+        name: values.name,
+        description: values.description,
+        cover_image: values.cover_image,
+        price_range: values.price_range,
+        rating: values.rating || null,
+        address: values.address || null,
+        lat: values.lat || null,
+        lng: values.lng || null,
+      };
 
       if (place) {
         // Update existing place
         const { error } = await supabase
           .from("places")
-          .update({
-            name: values.name,
-            description: values.description,
-            cover_image: values.cover_image,
-            rating: values.rating,
-            price_range: values.price_range,
-            address: values.address,
-            lat: mockLat,
-            lng: mockLng,
-          })
+          .update(placeData)
           .eq("id", place.id)
-          .eq("created_by", user.id); // Ensure user owns the place
+          .eq("created_by", user.id);
 
         if (error) throw error;
 
@@ -104,14 +113,7 @@ export function PlaceForm({ place }: PlaceFormProps) {
           .from("places")
           .insert([
             {
-              name: values.name,
-              description: values.description,
-              cover_image: values.cover_image,
-              rating: values.rating,
-              price_range: values.price_range,
-              address: values.address,
-              lat: mockLat,
-              lng: mockLng,
+              ...placeData,
               created_by: user.id,
             },
           ])
@@ -125,20 +127,17 @@ export function PlaceForm({ place }: PlaceFormProps) {
           description: `${values.name} has been added to your places.`,
         });
 
-        // Navigate to the new place
         navigate(`/places/${data.id}`);
         return;
       }
 
-      // For updates, navigate back to the place detail page
       navigate(`/places/${place.id}`);
     } catch (error: any) {
       console.error("Error managing place:", error);
       toast({
         variant: "destructive",
         title: "Error managing place",
-        description:
-          error.message || "An unexpected error occurred. Please try again.",
+        description: error.message || "An unexpected error occurred. Please try again.",
       });
     } finally {
       setIsSubmitting(false);
@@ -160,7 +159,7 @@ export function PlaceForm({ place }: PlaceFormProps) {
             name="name"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Name</FormLabel>
+                <FormLabel>Name *</FormLabel>
                 <FormControl>
                   <Input placeholder="Enter place name" {...field} />
                 </FormControl>
@@ -177,7 +176,7 @@ export function PlaceForm({ place }: PlaceFormProps) {
             name="description"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Description</FormLabel>
+                <FormLabel>Description *</FormLabel>
                 <FormControl>
                   <Textarea
                     placeholder="Describe the place..."
@@ -198,7 +197,7 @@ export function PlaceForm({ place }: PlaceFormProps) {
             name="cover_image"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Cover Image</FormLabel>
+                <FormLabel>Cover Image *</FormLabel>
                 <FormControl>
                   <ImageUpload
                     value={field.value}
@@ -213,31 +212,15 @@ export function PlaceForm({ place }: PlaceFormProps) {
 
           <FormField
             control={form.control}
-            name="rating"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Rating</FormLabel>
-                <FormControl>
-                  <StarRating value={field.value} onChange={field.onChange} />
-                </FormControl>
-                <FormDescription>
-                  Rate the place from 1 to 5 stars
-                </FormDescription>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
             name="price_range"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Price (VND)</FormLabel>
+                <FormLabel>Price (VND) *</FormLabel>
                 <FormControl>
                   <PriceInput
                     value={field.value}
                     onChange={field.onChange}
+                    disabled={field.disabled}
                   />
                 </FormControl>
                 <FormMessage />
@@ -247,18 +230,83 @@ export function PlaceForm({ place }: PlaceFormProps) {
 
           <FormField
             control={form.control}
-            name="address"
+            name="rating"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Address</FormLabel>
+                <FormLabel>Rating (Optional)</FormLabel>
                 <FormControl>
-                  <Input placeholder="Enter the address" {...field} />
+                  <StarRating value={field.value || 0} onChange={field.onChange} />
                 </FormControl>
-                <FormDescription>The full address of the place</FormDescription>
+                <FormDescription>
+                  Rate the place from 1 to 5 stars
+                </FormDescription>
                 <FormMessage />
               </FormItem>
             )}
           />
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <FormField
+              control={form.control}
+              name="address"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Address (Optional)</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Enter the address" {...field} value={field.value || ""} />
+                  </FormControl>
+                  <FormDescription>The full address of the place</FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <div className="grid grid-cols-2 gap-4">
+              <FormField
+                control={form.control}
+                name="lat"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Latitude (Optional)</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="number"
+                        step="any"
+                        placeholder="e.g., 16.047079"
+                        {...field}
+                        value={field.value || ""}
+                        onChange={(e) => field.onChange(e.target.value ? parseFloat(e.target.value) : null)}
+                      />
+                    </FormControl>
+                    <FormDescription>Between -90 and 90</FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="lng"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Longitude (Optional)</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="number"
+                        step="any"
+                        placeholder="e.g., 108.206230"
+                        {...field}
+                        value={field.value || ""}
+                        onChange={(e) => field.onChange(e.target.value ? parseFloat(e.target.value) : null)}
+                      />
+                    </FormControl>
+                    <FormDescription>Between -180 and 180</FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+          </div>
 
           <Button type="submit" disabled={isSubmitting}>
             {isSubmitting ? "Saving..." : place ? "Update Place" : "Add Place"}

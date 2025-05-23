@@ -15,6 +15,16 @@ import { leafletLayer } from "protomaps-leaflet";
 
 const API_KEY = import.meta.env.VITE_PROTOMAPS_API_KEY;
 
+// Add this helper function at the top level
+const formatPrice = (price: number) => {
+  return new Intl.NumberFormat('vi-VN', {
+    style: 'currency',
+    currency: 'VND',
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0
+  }).format(price);
+};
+
 export default function PlaceDetailPage() {
   const { id } = useParams<{ id: string }>();
   const { user } = useAuth();
@@ -103,11 +113,11 @@ export default function PlaceDetailPage() {
               created_at: new Date(review.created_at),
               user: profileData
                 ? {
-                    id: profileData.id,
-                    full_name: profileData.full_name || "Anonymous",
-                    username: profileData.username || "user",
-                    avatar_url: profileData.avatar_url,
-                  }
+                  id: profileData.id,
+                  full_name: profileData.full_name || "Anonymous",
+                  username: profileData.username || "user",
+                  avatar_url: profileData.avatar_url,
+                }
                 : undefined,
             };
           })
@@ -343,11 +353,10 @@ export default function PlaceDetailPage() {
               {Array.from({ length: 5 }).map((_, i) => (
                 <Star
                   key={i}
-                  className={`h-5 w-5 ${
-                    i < Math.round(place.rating)
-                      ? "text-yellow-400 fill-yellow-400"
-                      : "text-gray-300"
-                  }`}
+                  className={`h-5 w-5 ${i < Math.round(place.rating)
+                    ? "text-yellow-400 fill-yellow-400"
+                    : "text-gray-300"
+                    }`}
                 />
               ))}
             </div>
@@ -355,10 +364,7 @@ export default function PlaceDetailPage() {
               ({place.rating.toFixed(1)})
             </span>
             <span className="text-muted-foreground">
-              {/* Price range display */}
-              {Array.from({ length: place.price_range }).map((_, i) => (
-                <span key={i}>$</span>
-              ))}
+              {formatPrice(place.price_range)}
             </span>
           </div>
 

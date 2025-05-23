@@ -139,9 +139,9 @@ export default function LoginPage() {
     <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
       <div className="w-full max-w-md space-y-8 bg-white p-8 rounded-lg shadow-md">
         <div className="text-center">
-          <h1 className="text-2xl font-bold">Welcome to Hangouts</h1>
+          <h1 className="text-2xl font-bold">Welcome to DaNangLover</h1>
           <p className="text-gray-600 mt-2">
-            Sign in to discover amazing places
+            Please login to share places and more!
           </p>
         </div>
 

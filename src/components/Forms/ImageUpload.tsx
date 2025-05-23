@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Upload, X, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -11,6 +10,60 @@ interface ImageUploadProps {
   onChange: (url: string) => void;
   label?: string;
 }
+
+// Function to resize image while maintaining aspect ratio
+const resizeImage = (file: File, maxDimension: number): Promise<Blob> => {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+
+    img.onload = () => {
+      let width = img.width;
+      let height = img.height;
+
+      // Calculate new dimensions while maintaining aspect ratio
+      if (width > height) {
+        if (width > maxDimension) {
+          height = Math.round((height * maxDimension) / width);
+          width = maxDimension;
+        }
+      } else {
+        if (height > maxDimension) {
+          width = Math.round((width * maxDimension) / height);
+          height = maxDimension;
+        }
+      }
+
+      // Set canvas dimensions
+      canvas.width = width;
+      canvas.height = height;
+
+      // Draw and resize image
+      ctx?.drawImage(img, 0, 0, width, height);
+
+      // Convert to blob
+      canvas.toBlob(
+        (blob) => {
+          if (blob) {
+            resolve(blob);
+          } else {
+            reject(new Error('Failed to create blob from canvas'));
+          }
+        },
+        file.type,
+        0.9 // Quality (0.9 = 90% quality)
+      );
+    };
+
+    img.onerror = () => {
+      reject(new Error('Failed to load image'));
+    };
+
+    // Load image from file
+    img.src = URL.createObjectURL(file);
+  });
+};
 
 export default function ImageUpload({ value, onChange, label = "Image" }: ImageUploadProps) {
   const [isUploading, setIsUploading] = useState(false);
@@ -46,15 +99,22 @@ export default function ImageUpload({ value, onChange, label = "Image" }: ImageU
       setIsUploading(true);
       setUploadProgress(0);
 
+      // Resize image before upload
+      const resizedBlob = await resizeImage(file, 1280);
+      const resizedFile = new File([resizedBlob], file.name, {
+        type: file.type,
+        lastModified: file.lastModified,
+      });
+
       // Create a unique file path with user ID as the folder
       const fileExt = file.name.split('.').pop();
       const fileName = `${user.id}/${Date.now()}-${Math.random().toString(36).substring(2, 15)}.${fileExt}`;
       const filePath = fileName;
 
-      // Upload file to Supabase Storage
+      // Upload resized file to Supabase Storage
       const { error: uploadError, data } = await supabase.storage
         .from('place_images')
-        .upload(filePath, file, {
+        .upload(filePath, resizedFile, {
           cacheControl: '3600',
           upsert: false,
         });
@@ -63,7 +123,7 @@ export default function ImageUpload({ value, onChange, label = "Image" }: ImageU
         throw uploadError;
       }
 
-      // Manual tracking of progress (since we removed the callback)
+      // Manual tracking of progress
       setUploadProgress(100);
 
       // Get public URL

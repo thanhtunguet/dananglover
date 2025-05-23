@@ -1,4 +1,3 @@
-
 import { Input } from "@/components/ui/input";
 import { FormDescription } from "@/components/ui/form";
 
@@ -13,9 +12,8 @@ export default function PriceInput({
   onChange,
   disabled = false
 }: PriceInputProps) {
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    // Convert to number and ensure it's not negative
-    const numValue = Math.max(0, parseInt(e.target.value) || 0);
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const numValue = parseInt(e.target.value) || 0;
     onChange(numValue);
   };
 
@@ -25,9 +23,9 @@ export default function PriceInput({
         <Input
           type="number"
           min={0}
-          step={10000}
-          value={value}
-          onChange={handleInputChange}
+          step={1000}
+          value={value || ""}
+          onChange={handleChange}
           disabled={disabled}
           className="w-full"
         />

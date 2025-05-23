@@ -171,29 +171,29 @@ export default function BlogPostForm({ postId }: BlogPostFormProps) {
         place_id: completePost.place_id,
         places: completePost.places
           ? {
-              id: completePost.places.id,
-              name: completePost.places.name,
-              description: completePost.places.description,
-              cover_image: completePost.places.cover_image,
-              rating: completePost.places.rating,
-              price_range: completePost.places.price_range,
-              location: {
-                address: completePost.places.address,
-                lat: completePost.places.lat,
-                lng: completePost.places.lng,
-              },
-              created_by: completePost.places.created_by,
-              created_at: new Date(completePost.places.created_at),
-            }
+            id: completePost.places.id,
+            name: completePost.places.name,
+            description: completePost.places.description,
+            cover_image: completePost.places.cover_image,
+            rating: completePost.places.rating,
+            price_range: completePost.places.price_range,
+            location: {
+              address: completePost.places.address,
+              lat: completePost.places.lat,
+              lng: completePost.places.lng,
+            },
+            created_by: completePost.places.created_by,
+            created_at: new Date(completePost.places.created_at),
+          }
           : undefined,
         author_id: completePost.author_id,
         profiles: completePost.profiles
           ? {
-              id: completePost.profiles.id,
-              full_name: completePost.profiles.full_name || "Anonymous",
-              username: completePost.profiles.username || "user",
-              avatar_url: completePost.profiles.avatar_url,
-            }
+            id: completePost.profiles.id,
+            full_name: completePost.profiles.full_name || "Anonymous",
+            username: completePost.profiles.username || "user",
+            avatar_url: completePost.profiles.avatar_url,
+          }
           : undefined,
         cover_image: completePost.cover_image,
         created_at: new Date(completePost.created_at),
@@ -266,29 +266,29 @@ export default function BlogPostForm({ postId }: BlogPostFormProps) {
         place_id: completePost.place_id,
         places: completePost.places
           ? {
-              id: completePost.places.id,
-              name: completePost.places.name,
-              description: completePost.places.description,
-              cover_image: completePost.places.cover_image,
-              rating: completePost.places.rating,
-              price_range: completePost.places.price_range,
-              location: {
-                address: completePost.places.address,
-                lat: completePost.places.lat,
-                lng: completePost.places.lng,
-              },
-              created_by: completePost.places.created_by,
-              created_at: new Date(completePost.places.created_at),
-            }
+            id: completePost.places.id,
+            name: completePost.places.name,
+            description: completePost.places.description,
+            cover_image: completePost.places.cover_image,
+            rating: completePost.places.rating,
+            price_range: completePost.places.price_range,
+            location: {
+              address: completePost.places.address,
+              lat: completePost.places.lat,
+              lng: completePost.places.lng,
+            },
+            created_by: completePost.places.created_by,
+            created_at: new Date(completePost.places.created_at),
+          }
           : undefined,
         author_id: completePost.author_id,
         profiles: completePost.profiles
           ? {
-              id: completePost.profiles.id,
-              full_name: completePost.profiles.full_name || "Anonymous",
-              username: completePost.profiles.username || "user",
-              avatar_url: completePost.profiles.avatar_url,
-            }
+            id: completePost.profiles.id,
+            full_name: completePost.profiles.full_name || "Anonymous",
+            username: completePost.profiles.username || "user",
+            avatar_url: completePost.profiles.avatar_url,
+          }
           : undefined,
         cover_image: completePost.cover_image,
         created_at: new Date(completePost.created_at),
@@ -406,7 +406,6 @@ export default function BlogPostForm({ postId }: BlogPostFormProps) {
           name="cover_image"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Cover Image</FormLabel>
               <FormControl>
                 <ImageUpload
                   value={field.value}

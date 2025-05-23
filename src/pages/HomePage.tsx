@@ -55,13 +55,13 @@ export default function HomePage() {
     searchQuery.trim() === ""
       ? places
       : places.filter((place) => {
-          const query = searchQuery.toLowerCase();
-          return (
-            place.name.toLowerCase().includes(query) ||
-            place.description.toLowerCase().includes(query) ||
-            place.location.address.toLowerCase().includes(query)
-          );
-        });
+        const query = searchQuery.toLowerCase();
+        return (
+          place.name.toLowerCase().includes(query) ||
+          place.description.toLowerCase().includes(query) ||
+          place.location.address.toLowerCase().includes(query)
+        );
+      });
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -72,10 +72,10 @@ export default function HomePage() {
     <div className="container pb-12 pt-4 md:pt-8">
       <div className="flex flex-col items-center text-center mb-8 space-y-2">
         <h1 className="text-3xl font-bold tracking-tight sm:text-4xl md:text-5xl">
-          Discover amazing places
+          DaNang lover
         </h1>
         <p className="max-w-[700px] text-lg text-muted-foreground">
-          Find and share your favorite hangout spots with friends
+          A space for DaNang lovers to share their favorite places!
         </p>
 
         <form
